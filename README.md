@@ -1,6 +1,6 @@
 # **Custom Firmware Development Guide for Full Device Emulation**
 
-# **Preface**
+## **Preface**
 
 **Attention, you thieving scum.** I’m not here to coddle or indulge your pitiful schemes. **FUCK AQUA**, better known as Aqua Teen Paster Force—a disgrace to anyone with a shred of integrity. **FUCK DIVINER**, too. And DUCK? Go degrade yourself elsewhere. **DMA KINGDOM**? You and your parasitic empire can rot in hell with the rest of these frauds. SHITLETTE and all of you money-grubbing thieves, prepare for a reckoning. The **Wrath of God**? You’re about to understand the meaning of true devastation. Either atone for your greed, or get swept away by the destruction you deserve.
 
