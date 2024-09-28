@@ -15,8 +15,6 @@ If you need assistance, have inquiries, or are looking to collaborate, feel free
 
 ### **Discord** - **VCPU**
 
-Reach out anytime for support or further discussion on this guide or related topics. Whether you’re a developer needing in-depth help or a researcher diving into FPGA emulation, I’m here to ensure your path to success is smooth and informed. Let's build something remarkable together.
-
 ---
 
 ## **Table of Contents**
