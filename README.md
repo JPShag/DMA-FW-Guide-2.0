@@ -1250,4 +1250,4 @@ By following this comprehensive guide, you should now have the knowledge and too
 
 If you have any questions, need further assistance, or wish to contribute to the development of custom firmware, feel free to join our community on Discord:
 
-[![Discord Banner](https://discord.com/api/guilds/1204901264706506862/widget.png?style=banner2)](https://discord.gg/dS2gDUDQmV)
+[[Discord Banner](https://discord.gg/dS2gDUDQmV)
