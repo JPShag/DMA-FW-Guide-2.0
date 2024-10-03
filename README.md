@@ -80,9 +80,9 @@ For assistance, inquiries, or collaboration opportunities, please join our commu
     - [16.1 Continuous Testing and Documentation](#161-continuous-testing-and-documentation)
     - [16.2 Managing Firmware Versioning](#162-managing-firmware-versioning)
     - [16.3 Security Considerations](#163-security-considerations)
-17. [Incorporating Echnod's FPGA DMA Firmware](#17-incorporating-echnods-fpga-dma-firmware)
-    - [17.1 Overview of Echnod's Contributions](#171-overview-of-echnods-contributions)
-    - [17.2 Adapting Echnod's Techniques](#172-adapting-echnods-techniques)
+17. [Incorporating ekknod's FPGA DMA Firmware](#17-incorporating-ekknods-fpga-dma-firmware)
+    - [17.1 Overview of ekknod's Contributions](#171-overview-of-ekknods-contributions)
+    - [17.2 Adapting ekknod's Techniques](#172-adapting-ekknods-techniques)
     - [17.3 Enhancements for Wi-Fi and Multimedia Emulation](#173-enhancements-for-wi-fi-and-multimedia-emulation)
 18. [Implementing Additional Features](#18-implementing-additional-features)
     - [18.1 Power Management Emulation](#181-power-management-emulation)
@@ -742,16 +742,16 @@ Ensure you collect the following:
 
 ---
 
-## **17. Incorporating Echnod's FPGA DMA Firmware**
+## **17. Incorporating ekknod's FPGA DMA Firmware**
 
-### **17.1 Overview of Echnod's Contributions**
+### **17.1 Overview of ekknod's Contributions**
 
 - **Optimized TLP Handling**
 - **Advanced DMA Techniques**
 - **Enhanced Error Handling**
 - **Multimedia Stream Emulation**
 
-### **17.2 Adapting Echnod's Techniques**
+### **17.2 Adapting ekknod's Techniques**
 
 1. **Implement Efficient TLP Parsing**:
 
@@ -848,7 +848,7 @@ By following this guide, you have learned how to develop custom firmware for ful
 - **PCILeech-FPGA Repository**: [GitHub](https://github.com/ufrisk/pcileech-fpga)
 - **Xilinx Vivado Documentation**: [Xilinx Documentation](https://www.xilinx.com/support/documentation.html)
 - **PCI-SIG Specifications**: [PCI-SIG](https://pcisig.com/specifications)
-- **Echnod's FPGA DMA Firmware**: *[Provide link if available]*
+- **ekknod's FPGA DMA Firmware**: *[Provide link if available]*
 
 ---
 
