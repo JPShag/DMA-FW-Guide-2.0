@@ -4,19 +4,26 @@
 
 ## **Preface**
 
-Welcome to the comprehensive guide on developing custom firmware for full device emulation using FPGA-based DMA hardware. This guide aims to provide a detailed, step-by-step approach suitable for both beginners and experienced developers. Whether you're a firmware developer, hardware tester, security researcher, or FPGA enthusiast, this guide will equip you with the knowledge and tools necessary to create accurate and effective emulation firmware.
+Welcome to the comprehensive guide on developing custom firmware for full device emulation using FPGA-based DMA hardware. This guide is designed to cater to both beginners and advanced developers. It is divided into two parts:
+
+- **Part 1: The Basics** – Covers foundational knowledge and step-by-step instructions for initial firmware development.
+- **Part 2: Advanced Tutorials** – Delves into complex concepts, optimizations, and advanced techniques for enhancing your firmware.
+
+Whether you're a firmware developer, hardware engineer, security researcher, or FPGA enthusiast, this guide will equip you with the knowledge and tools necessary to create accurate and efficient emulation firmware.
 
 ---
 
 ## **Contact Information**
 
-If you need assistance, have inquiries, or are looking to collaborate, feel free to reach out. I'm available to provide guidance, troubleshoot complex problems, or discuss ideas in detail.
+For assistance, inquiries, or collaboration opportunities, please join our community on Discord:
 
-### **Discord** - **VCPU**
+### **Discord** - **VCPU** ([Join Now](https://discord.gg/dS2gDUDQmV))
 
 ---
 
-## **Table of Contents**
+# **Table of Contents**
+
+## **Part 1: The Basics**
 
 1. [Introduction](#1-introduction)
    - [1.1 Purpose of the Guide](#11-purpose-of-the-guide)
@@ -26,50 +33,71 @@ If you need assistance, have inquiries, or are looking to collaborate, feel free
    - [3.1 Supported FPGA-Based Hardware](#31-supported-fpga-based-hardware)
    - [3.2 PCIe Hardware Considerations](#32-pcie-hardware-considerations)
    - [3.3 System Requirements](#33-system-requirements)
-4. [Requirements](#4-requirements)
-   - [4.1 Hardware](#41-hardware)
-   - [4.2 Software](#42-software)
-   - [4.3 Environment Setup](#43-environment-setup)
-5. [Gathering Donor Device Information](#5-gathering-donor-device-information)
-   - [5.1 Using Arbor for PCIe Device Scanning](#51-using-arbor-for-pcie-device-scanning)
-   - [5.2 Extracting and Recording Device Attributes](#52-extracting-and-recording-device-attributes)
-6. [Initial Firmware Customization](#6-initial-firmware-customization)
-   - [6.1 Modifying Configuration Space](#61-modifying-configuration-space)
-   - [6.2 Inserting the Device Serial Number (DSN)](#62-inserting-the-device-serial-number-dsn)
-7. [Vivado Project Setup and Customization](#7-vivado-project-setup-and-customization)
-   - [7.1 Generating Vivado Project Files](#71-generating-vivado-project-files)
-   - [7.2 Modifying IP Blocks](#72-modifying-ip-blocks)
-8. [Advanced Firmware Customization](#8-advanced-firmware-customization)
-   - [8.1 Configuring PCIe Parameters for Emulation](#81-configuring-pcie-parameters-for-emulation)
-   - [8.2 Adjusting BARs and Memory Mapping](#82-adjusting-bars-and-memory-mapping)
-   - [8.3 Emulating Device Power Management and Interrupts](#83-emulating-device-power-management-and-interrupts)
-9. [Emulating Device-Specific Capabilities](#9-emulating-device-specific-capabilities)
-   - [9.1 Implementing Advanced PCIe Capabilities](#91-implementing-advanced-pcie-capabilities)
-   - [9.2 Emulating Vendor-Specific Features](#92-emulating-vendor-specific-features)
-10. [Transaction Layer Packet (TLP) Emulation](#10-transaction-layer-packet-tlp-emulation)
-    - [10.1 Understanding and Capturing TLPs](#101-understanding-and-capturing-tlps)
-    - [10.2 Crafting Custom TLPs for Specific Operations](#102-crafting-custom-tlps-for-specific-operations)
-11. [Building, Flashing, and Testing](#11-building-flashing-and-testing)
-    - [11.1 Synthesis and Implementation](#111-synthesis-and-implementation)
-    - [11.2 Flashing the Bitstream](#112-flashing-the-bitstream)
-    - [11.3 Testing and Validation](#113-testing-and-validation)
-12. [Advanced Debugging Techniques](#12-advanced-debugging-techniques)
-    - [12.1 Using Vivado's Integrated Logic Analyzer](#121-using-vivados-integrated-logic-analyzer)
-    - [12.2 PCIe Traffic Analysis Tools](#122-pcie-traffic-analysis-tools)
-13. [Troubleshooting](#13-troubleshooting)
-    - [13.1 Device Detection Issues](#131-device-detection-issues)
-    - [13.2 Memory Mapping and BAR Configuration Errors](#132-memory-mapping-and-bar-configuration-errors)
-    - [13.3 DMA Performance and TLP Errors](#133-dma-performance-and-tlp-errors)
-14. [Emulation Accuracy and Optimizations](#14-emulation-accuracy-and-optimizations)
-    - [14.1 Techniques for Accurate Timing Emulation](#141-techniques-for-accurate-timing-emulation)
-    - [14.2 Dynamic Response to System Calls](#142-dynamic-response-to-system-calls)
-15. [Best Practices for Firmware Development](#15-best-practices-for-firmware-development)
-    - [15.1 Continuous Testing and Documentation](#151-continuous-testing-and-documentation)
-    - [15.2 Managing Firmware Versioning](#152-managing-firmware-versioning)
-    - [15.3 Security Considerations](#153-security-considerations)
-16. [Additional Resources](#16-additional-resources)
-17. [Appendix A: Shadow Configuration Space](#17-appendix-a-shadow-configuration-space)
-18. [Appendix B: Writemask Implementation](#18-appendix-b-writemask-implementation)
+4. [Project Hierarchy Overview](#4-project-hierarchy-overview)
+   - [4.1 Directory Structure](#41-directory-structure)
+   - [4.2 Key Files and Their Roles](#42-key-files-and-their-roles)
+5. [Requirements](#5-requirements)
+   - [5.1 Hardware](#51-hardware)
+   - [5.2 Software](#52-software)
+   - [5.3 Environment Setup](#53-environment-setup)
+6. [Gathering Donor Device Information](#6-gathering-donor-device-information)
+   - [6.1 Using PCIe Device Scanning Tools](#61-using-pcie-device-scanning-tools)
+   - [6.2 Extracting and Recording Device Attributes](#62-extracting-and-recording-device-attributes)
+7. [Initial Firmware Customization](#7-initial-firmware-customization)
+   - [7.1 Modifying Configuration Space](#71-modifying-configuration-space)
+   - [7.2 Inserting the Device Serial Number (DSN)](#72-inserting-the-device-serial-number-dsn)
+8. [Vivado Project Setup and Customization](#8-vivado-project-setup-and-customization)
+   - [8.1 Generating Vivado Project Files](#81-generating-vivado-project-files)
+   - [8.2 Modifying IP Blocks](#82-modifying-ip-blocks)
+9. [Building, Flashing, and Testing](#9-building-flashing-and-testing)
+   - [9.1 Synthesis and Implementation](#91-synthesis-and-implementation)
+   - [9.2 Flashing the Bitstream](#92-flashing-the-bitstream)
+   - [9.3 Testing and Validation](#93-testing-and-validation)
+10. [Troubleshooting](#10-troubleshooting)
+    - [10.1 Device Detection Issues](#101-device-detection-issues)
+    - [10.2 Memory Mapping and BAR Configuration Errors](#102-memory-mapping-and-bar-configuration-errors)
+    - [10.3 DMA Performance and TLP Errors](#103-dma-performance-and-tlp-errors)
+
+## **Part 2: Advanced Tutorials**
+
+11. [Advanced Firmware Customization](#11-advanced-firmware-customization)
+    - [11.1 Configuring PCIe Parameters for Emulation](#111-configuring-pcie-parameters-for-emulation)
+    - [11.2 Adjusting BARs and Memory Mapping](#112-adjusting-bars-and-memory-mapping)
+    - [11.3 Emulating Device Power Management and Interrupts](#113-emulating-device-power-management-and-interrupts)
+12. [Emulating Device-Specific Capabilities](#12-emulating-device-specific-capabilities)
+    - [12.1 Implementing Advanced PCIe Capabilities](#121-implementing-advanced-pcie-capabilities)
+    - [12.2 Emulating Vendor-Specific Features](#122-emulating-vendor-specific-features)
+13. [Transaction Layer Packet (TLP) Emulation](#13-transaction-layer-packet-tlp-emulation)
+    - [13.1 Understanding and Capturing TLPs](#131-understanding-and-capturing-tlps)
+    - [13.2 Crafting Custom TLPs for Specific Operations](#132-crafting-custom-tlps-for-specific-operations)
+14. [Advanced Debugging Techniques](#14-advanced-debugging-techniques)
+    - [14.1 Using Vivado's Integrated Logic Analyzer](#141-using-vivados-integrated-logic-analyzer)
+    - [14.2 PCIe Traffic Analysis Tools](#142-pcie-traffic-analysis-tools)
+15. [Emulation Accuracy and Optimizations](#15-emulation-accuracy-and-optimizations)
+    - [15.1 Techniques for Accurate Timing Emulation](#151-techniques-for-accurate-timing-emulation)
+    - [15.2 Dynamic Response to System Calls](#152-dynamic-response-to-system-calls)
+16. [Best Practices for Firmware Development](#16-best-practices-for-firmware-development)
+    - [16.1 Continuous Testing and Documentation](#161-continuous-testing-and-documentation)
+    - [16.2 Managing Firmware Versioning](#162-managing-firmware-versioning)
+    - [16.3 Security Considerations](#163-security-considerations)
+17. [Incorporating Echnod's FPGA DMA Firmware](#17-incorporating-echnods-fpga-dma-firmware)
+    - [17.1 Overview of Echnod's Contributions](#171-overview-of-echnods-contributions)
+    - [17.2 Adapting Echnod's Techniques](#172-adapting-echnods-techniques)
+    - [17.3 Enhancements for Wi-Fi and Multimedia Emulation](#173-enhancements-for-wi-fi-and-multimedia-emulation)
+18. [Implementing Additional Features](#18-implementing-additional-features)
+    - [18.1 Power Management Emulation](#181-power-management-emulation)
+    - [18.2 PCIe Gen3 and Beyond](#182-pcie-gen3-and-beyond)
+    - [18.3 Virtual Functions and SR-IOV](#183-virtual-functions-and-sr-iov)
+19. [Appendices](#19-appendices)
+    - [19.1 Appendix A: Shadow Configuration Space](#191-appendix-a-shadow-configuration-space)
+    - [19.2 Appendix B: Writemask Implementation](#192-appendix-b-writemask-implementation)
+20. [Conclusion](#20-conclusion)
+21. [Additional Resources](#21-additional-resources)
+22. [Support and Community](#22-support-and-community)
+
+---
+
+# **Part 1: The Basics**
 
 ---
 
@@ -77,31 +105,27 @@ If you need assistance, have inquiries, or are looking to collaborate, feel free
 
 ### **1.1 Purpose of the Guide**
 
-The primary objective of this guide is to equip developers, security researchers, and hardware engineers with the knowledge and practical steps necessary to develop custom DMA firmware for accurate 1:1 hardware device emulation using FPGA-based systems like **PCILeech-FPGA**. This enables applications in hardware testing, system debugging, malware analysis, and other scenarios requiring undetectable or legitimate-looking device emulation.
+The primary goal of this guide is to provide a step-by-step approach to developing custom firmware for FPGA-based DMA hardware, enabling accurate emulation of PCIe devices. This facilitates applications in hardware testing, security research, system debugging, and more.
 
 ### **1.2 Target Audience**
 
-- **Firmware Developers**: Engineers building custom firmware for hardware emulation, testing, or bypassing hardware restrictions.
-- **Hardware Testers**: Professionals emulating faulty or outdated hardware devices to assess system resilience or compatibility.
-- **Security Researchers**: Individuals utilizing custom firmware for vulnerability testing, malware analysis, or security assessments.
-- **FPGA Enthusiasts**: Hobbyists exploring FPGA customization and low-level hardware emulation.
-- **Non-Programmers**: Individuals with minimal programming experience who are interested in learning about firmware development and device emulation.
+- **Beginners**: Individuals new to firmware development and FPGA programming.
+- **Firmware Developers**: Engineers creating custom firmware for device emulation or testing.
+- **Hardware Engineers**: Professionals working on hardware device development and testing.
+- **Security Researchers**: Individuals interested in hardware-based security analysis.
 
 ---
 
 ## **2. Key Definitions**
 
-Understanding the terminology is crucial for effectively following this guide. Below are key definitions related to PCIe, DMA, and device emulation:
+Understanding the terminology is crucial for effective firmware development.
 
-- **DMA (Direct Memory Access)**: A capability allowing hardware devices to directly read from or write to system memory without CPU intervention, facilitating rapid data transfers.
-- **TLP (Transaction Layer Packet)**: The fundamental unit of communication in PCIe architecture, encapsulating control and data information.
-- **BAR (Base Address Register)**: Registers in PCIe devices that map device memory into system memory space, defining memory and I/O address regions.
-- **FPGA (Field Programmable Gate Array)**: A reconfigurable integrated circuit that can be programmed to perform specific hardware functions, enabling custom device emulation.
-- **MSI/MSI-X (Message Signaled Interrupts)**: Mechanisms used by PCIe devices to send interrupts to the CPU, handling asynchronous events.
-- **Device Serial Number (DSN)**: A unique identifier associated with a specific device, often used for advanced device identification and verification.
-- **PCIe Configuration Space**: A memory area where PCIe devices provide information about themselves and configure operational parameters.
-- **Donor Card**: A PCIe device used to extract configuration and identification details for the purpose of emulating its behavior on an FPGA.
-- **ACs (Anti-Cheats)**: Software mechanisms designed to prevent cheating in games and applications by detecting unauthorized hardware or software modifications.
+- **DMA (Direct Memory Access)**: Allows hardware devices to access system memory directly, bypassing the CPU.
+- **FPGA (Field Programmable Gate Array)**: A reconfigurable integrated circuit that can be programmed to perform specific hardware functions.
+- **PCIe (Peripheral Component Interconnect Express)**: A high-speed serial computer expansion bus standard for connecting hardware devices.
+- **TLP (Transaction Layer Packet)**: The fundamental unit of communication in PCIe, encapsulating control and data information.
+- **BAR (Base Address Register)**: Registers in PCIe devices that map device memory into system memory space.
+- **Device Serial Number (DSN)**: A unique identifier for a hardware device.
 
 ---
 
@@ -109,1145 +133,777 @@ Understanding the terminology is crucial for effectively following this guide. B
 
 ### **3.1 Supported FPGA-Based Hardware**
 
-This guide focuses on FPGA-based devices compatible with the **PCILeech-FPGA** framework. Below is a list of compatible devices:
+The following FPGA devices are compatible with this guide:
 
 - **Squirrel (35T)**
-  - **Description**: Affordable and widely accessible FPGA-based DMA device.
-  - **Use Case**: Suitable for standard memory acquisition and device emulation tasks.
-
 - **EnigmaX1 (75T)**
-  - **Description**: Mid-tier FPGA offering enhanced resources and performance.
-  - **Use Case**: Ideal for more demanding memory operations requiring higher bandwidth.
-
 - **ZDMA (100T)**
-  - **Description**: High-performance FPGA, optimized for rapid memory interactions.
-  - **Use Case**: Best suited for scenarios requiring fast and extensive memory reads/writes.
-
 - **Kintex-7**
-  - **Description**: Advanced FPGA with robust capabilities for complex projects.
-  - **Use Case**: Suitable for large-scale or highly customized DMA solutions.
+
+These devices are capable of performing DMA operations and can be programmed using Xilinx Vivado.
 
 ### **3.2 PCIe Hardware Considerations**
 
-To ensure smooth emulation, several PCIe-specific features must be addressed:
-
-- **IOMMU/VT-d Settings**
-  - **Recommendation**: Disable IOMMU (Intel's VT-d) to allow unrestricted DMA access.
-  - **Rationale**: IOMMU can restrict DMA operations, potentially interfering with memory acquisition and emulation.
-
-- **Kernel DMA Protection**
-  - **Recommendation**: Disable Kernel DMA Protection features found in modern systems.
-  - **Steps**:
-    - **Windows**: This may involve disabling Secure Boot or Virtualization-Based Security (VBS).
-    - **BIOS/UEFI**: Access firmware settings to turn off related security features.
-  - **Caution**: Disabling these features can expose the system to risks; ensure you're operating within a secure and isolated environment.
-
-- **PCIe Slot Requirements**
-  - **Recommendation**: Use a compatible PCIe slot that matches the FPGA device's requirements (e.g., x1, x4, x16).
-  - **Rationale**: Ensures optimal performance and compatibility with the host system.
+- **Disable IOMMU/VT-d**: To allow unrestricted DMA access.
+- **Disable Kernel DMA Protection**: In BIOS/UEFI settings.
+- **Ensure PCIe Slot Compatibility**: Use appropriate PCIe slots (e.g., x1, x4, x16).
 
 ### **3.3 System Requirements**
 
-- **Host System**
-  - **Processor**: Multi-core CPU (Intel i5/i7 or equivalent)
-  - **Memory**: Minimum 16GB RAM
-  - **Storage**: SSD with at least 100GB free space
-  - **Operating System**: Windows 10/11 (64-bit) or a compatible Linux distribution (e.g., Ubuntu, Debian) with necessary drivers
+- **Host System**:
+  - Multi-core CPU (Intel i5/i7 or equivalent)
+  - Minimum 16GB RAM
+  - SSD with at least 100GB free space
+  - Windows 10/11 (64-bit) or a compatible Linux distribution
 
-- **Peripheral Devices**
-  - **JTAG Adapter**: For flashing firmware onto the FPGA
-  - **PCIe Slot**: Ensure the host system has available PCIe slots compatible with the DMA card
-
----
-
-## **4. Requirements**
-
-### **4.1 Hardware**
-
-- **Donor PCIe Device**
-  - **Purpose**: Source of device IDs and configuration data for spoofing.
-  - **Examples**: Network adapters, storage controllers, or any generic PCIe card not used on the main PC.
-
-- **DMA FPGA Card**
-  - **Description**: FPGA-based device capable of performing DMA operations.
-  - **Examples**: Squirrel (35T), EnigmaX1 (75T), ZDMA (100T), Kintex-7.
-
-- **JTAG Programmer**
-  - **Purpose**: For flashing firmware onto the FPGA.
-  - **Examples**: Xilinx Platform Cable USB, Digilent JTAG USB Cable.
-
-### **4.2 Software**
-
-- **Vivado**
-  - **Description**: Xilinx's FPGA development software for synthesizing and building firmware projects.
-  - **Download**: [Xilinx Vivado](https://www.xilinx.com/support/download.html)
-
-- **Visual Studio**
-  - **Description**: Integrated Development Environment (IDE) for editing Verilog or VHDL code.
-  - **Download**: [Visual Studio Community](https://visualstudio.microsoft.com/vs/community/)
-
-- **PCILeech-FPGA**
-  - **Description**: The repository and base code for DMA firmware development.
-  - **Repository**: [PCILeech-FPGA on GitHub](https://github.com/ufrisk/pcileech-fpga)
-
-- **Arbor**
-  - **Description**: PCIe device scanning tool for gathering device information.
-  - **Download**: [Arbor by MindShare](https://www.mindshare.com/software/Arbor)
-  - **Note**: Requires account creation; offers a 14-day trial.
-
-- **Alternative Tools**
-  - **Telescan PE**
-    - **Description**: PCIe traffic analysis tool that can be used as an alternative to Arbor.
-    - **Download**: [Teledyne LeCroy Telescan PE](https://www.teledynelecroy.com/protocolanalyzer/pci-express/telescan-pe-software/resources/analysis-software)
-    - **Note**: Free but requires manual registration approval.
-
-### **4.3 Environment Setup**
-
-1. **Install Vivado**
-   - **Steps**:
-     1. Visit the [Xilinx Vivado Download Page](https://www.xilinx.com/support/download.html).
-     2. Download the appropriate version compatible with your FPGA device.
-     3. Follow the installation instructions provided by Xilinx.
-     4. Launch Vivado and ensure it is properly configured.
-
-2. **Install Visual Studio**
-   - **Steps**:
-     1. Visit the [Visual Studio Download Page](https://visualstudio.microsoft.com/vs/community/).
-     2. Download and install the **Visual Studio Community Edition**.
-     3. During installation, ensure you include workloads related to **Desktop development with C++** to support hardware description languages (HDLs) like Verilog or VHDL.
-
-3. **Clone the PCILeech-FPGA Repository**
-   - **Steps**:
-     1. Open a terminal or command prompt.
-     2. Clone the repository using Git:
-        ```bash
-        git clone https://github.com/ufrisk/pcileech-fpga.git
-        ```
-     3. Navigate to the cloned directory:
-        ```bash
-        cd pcileech-fpga
-        ```
-
-4. **Set Up a Clean Development Environment**
-   - **Recommendation**: Work in an isolated environment to prevent unintended interactions, especially if using the firmware for sensitive tasks like malware analysis.
-   - **Steps**:
-     1. Use a dedicated development machine or a virtual environment.
-     2. Ensure no other applications interfere with PCIe operations or FPGA programming.
+- **Peripheral Devices**:
+  - **JTAG Programmer**: For flashing firmware onto the FPGA.
+  - **Available PCIe Slot**: Compatible with the FPGA device.
 
 ---
 
-## **5. Gathering Donor Device Information**
+## **4. Project Hierarchy Overview**
 
-Accurate device emulation relies on extracting critical information from the donor device. This data allows your FPGA to mimic the target hardware in terms of PCIe configuration and behavior.
+Understanding the project structure helps in navigating and modifying the firmware effectively.
 
-### **5.1 Using Arbor for PCIe Device Scanning**
+### **4.1 Directory Structure**
 
-**Arbor** is a powerful tool for scanning PCIe devices and extracting necessary information. Follow these steps to gather donor device details:
+The project is organized as follows:
 
-1. **Install Arbor**
-   - **Steps**:
-     1. Visit the [Arbor Download Page](https://www.mindshare.com/software/Arbor).
-     2. Create an account if required.
-     3. Download and install Arbor on your system.
+```
+📦 pcileech-wifi-main
+ ┣ 📂 ip
+ ┃ ┣ 📂 100t
+ ┃ ┃ ┣ 📜 bram_bar_zero4k.xci
+ ┃ ┃ ┣ 📜 bram_pcie_cfgspace.xci
+ ┃ ┃ ┣ 📜 clk_wiz_0.xci
+ ┃ ┃ ┣ 📜 ...
+ ┃ ┃ ┗ 📜 pcileech_cfgspace_writemask.coe
+ ┣ 📂 pcie_7x
+ ┃ ┣ 📂 zdma
+ ┃ ┃ ┣ 📜 pcie_7x_0.v
+ ┃ ┃ ┣ 📜 ...
+ ┃ ┃ ┗ 📜 pcie_7x_0_rxeq_scan.v
+ ┣ 📂 src
+ ┃ ┣ 📜 pcileech_pcie_a7.sv
+ ┃ ┣ 📜 pcileech_pcie_cfg_a7.sv
+ ┃ ┣ 📜 ...
+ ┃ ┗ 📜 pcileech_squirrel_top.sv
+ ┣ 📜 build.md
+ ┣ 📜 generate-squirrel.bat
+ ┣ 📜 vivado_build.tcl
+ ┗ 📜 README.md
+```
 
-2. **Scan PCIe Devices**
-   - **Steps**:
-     1. Launch Arbor.
-     2. Navigate to the **Local System** tab.
-     3. Under **Scan Options**, ensure default settings are appropriate.
-     4. Click **Scan/Rescan** to detect all connected PCIe devices.
+### **4.2 Key Files and Their Roles**
 
-3. **Identify the Donor Device**
-   - **Criteria**:
-     - Should not be used on your main PC.
-     - Examples: PCIe WiFi cards, storage controllers, or generic PCIe devices.
-   - **Steps**:
-     1. Locate your donor device in the list of scanned devices.
-     2. Click on the device to view detailed configuration.
+- **`ip` Directory**: Contains IP cores used in the project.
+- **`pcie_7x` Directory**: Houses PCIe-specific modules.
+- **`src` Directory**: Contains the main source files, including:
 
-4. **Capture Device Data**
-   - **Information to Extract**:
-     - **Device ID**
-     - **Vendor ID**
-     - **Subsystem ID**
-     - **Revision ID**
-     - **Base Address Registers (BARs)**
-     - **Capabilities** (e.g., MSI, power management, PCIe link width/speed)
-     - **Device Serial Number (DSN)** (if available)
+  - **`pcileech_pcie_a7.sv`**: PCIe interface logic.
+  - **`pcileech_pcie_cfg_a7.sv`**: Configuration space implementation.
+  - **`pcileech_squirrel_top.sv`**: Top-level module for the Squirrel FPGA.
 
-   - **Steps**:
-     1. Navigate to the **PCI Config** tab within Arbor.
-     2. Scroll through the **Decode** section to locate and record the above details.
-     3. Take screenshots or notes of each value for reference during firmware customization.
+- **Build Scripts**:
 
-   - **Example Extraction**:
-
-     ![Device IDs](https://github.com/Silverr12/DMA-CFW-Guide/assets/89455475/8baec3fe-c4bd-478e-9f95-d262804d6f67)
-
-     ![Vendor ID](https://github.com/Silverr12/DMA-CFW-Guide/assets/89455475/39c7de6d-d8db-4744-b0a0-ddeca0dfd7d7)
-
-     ![Revision ID](https://github.com/Silverr12/DMA-CFW-Guide/assets/89455475/c2374ea7-ca9c-47b7-8a8d-4ceff5dffe3b)
-
-     ![BAR Sizing](https://github.com/Silverr12/DMA-CFW-Guide/assets/89455475/19239179-057a-4ed5-a79f-45cf242787a5)
-
-     ![Subsystem ID](https://github.com/Silverr12/DMA-CFW-Guide/assets/89455475/94522a95-70bd-4336-8e38-58c0839e38ad)
-
-     ![DSN](https://github.com/Silverr12/DMA-CFW-Guide/assets/89455475/595ae3e2-4cd8-4b3d-bcfa-cf6a59f289d5)
-
-   - **Note**: The DSN may not be present on all devices. If unavailable, proceed with zeros in the DSN field during customization.
-
-### **5.2 Extracting and Recording Device Attributes**
-
-After scanning, ensure you have accurately recorded the following attributes from the donor device:
-
-1. **Device ID**: A unique identifier for the hardware device.
-2. **Vendor ID**: The identifier of the device manufacturer.
-3. **Subsystem ID**: Identifies the specific subsystem associated with the device.
-4. **Revision ID**: The revision number of the hardware version.
-5. **Base Address Registers (BARs)**: Defines memory and I/O address regions of the device.
-6. **Capabilities**: Such as Power Management (PM), MSI/MSI-X, PCIe link speed, and width.
-7. **Device Serial Number (DSN)**: If applicable, the unique serial number associated with the device.
-
-**Important Considerations**:
-
-- **BAR Sizes**: Ensure the memory-mapped I/O regions match the donor device’s configuration.
-- **Capabilities**: Properly emulate all capabilities to ensure seamless integration with the host system.
-- **DSN**: Enhances the fidelity of emulation; use if available.
+  - **`generate-squirrel.bat`**: Batch script to generate the Vivado project for Squirrel.
+  - **`vivado_build.tcl`**: Tcl script for building the project in Vivado.
 
 ---
 
-## **6. Initial Firmware Customization**
+## **5. Requirements**
 
-With the necessary donor information in hand, proceed to customize the PCIe configuration space and memory mapping within the firmware to spoof the donor device.
+### **5.1 Hardware**
 
-### **6.1 Modifying Configuration Space**
+- **Donor PCIe Device**: The device you wish to emulate.
+- **DMA FPGA Card**: One of the supported FPGA devices.
+- **JTAG Programmer**: For flashing the firmware.
 
-1. **Navigate to the Configuration File**
-   - **Path**: `/PCIeSquirrel/src/pcileech_pcie_cfg_a7.sv`
-   - **Description**: This Verilog file contains the PCIe configuration logic for the device.
+### **5.2 Software**
 
-2. **Open the File in Visual Studio**
-   - **Steps**:
-     1. Launch **Visual Studio**.
-     2. Open the `pcileech_pcie_cfg_a7.sv` file located in the `/PCIeSquirrel/src/` directory.
+- **Xilinx Vivado**: For FPGA development.
+- **Visual Studio Code**: For editing source code.
+- **PCILeech-FPGA Repository**: Base code for firmware development.
+- **PCIe Device Scanning Tools**: 
 
-3. **Modify Master Abort Flag**
-   - **Steps**:
-     1. Use **Ctrl + F** to search for `rw[20]`.
-     2. Change the accompanying `0` to a `1` to enable the master abort flag.
-     ```verilog
-     rw[20] <= 1'b1; // Enable master abort flag
-     ```
+  - **Arbor**: Commercial tool with a trial version.
+  - **Alternatives**: `lspci` (Linux), **PCI-Z** (Windows).
 
-4. **Modify Device ID and Vendor ID**
-   - **Steps**:
-     1. Search for `cfg_deviceid`.
-     2. Update the Device ID with the donor's value:
-        ```verilog
-        cfg_deviceid <= 16'hXXXX;  // Replace XXXX with donor Device ID
-        ```
-     3. Similarly, search for `cfg_vendorid` and update:
-        ```verilog
-        cfg_vendorid <= 16'hYYYY;  // Replace YYYY with donor Vendor ID
-        ```
+### **5.3 Environment Setup**
 
-5. **Modify Subsystem ID**
-   - **Steps**:
-     1. Search for `cfg_subsysid`.
-     2. Update the Subsystem ID:
-        ```verilog
-        cfg_subsysid <= 16'hZZZZ;  // Replace ZZZZ with donor Subsystem ID
-        ```
+1. **Install Xilinx Vivado**:
 
-6. **Adjust BARs Based on Donor Device**
-   - **Steps**:
-     1. Locate the BAR size configurations.
-     2. Set the BAR sizes to match those of the donor device:
-        ```verilog
-        bar0_size <= 32'hXXXX_YYYY;  // Replace with donor's BAR0 size
-        ```
-     3. Repeat for additional BARs (BAR1, BAR2, etc.) as necessary.
+   - Download from [Xilinx Vivado Download Page](https://www.xilinx.com/support/download.html).
+   - Follow installation instructions.
 
-### **6.2 Inserting the Device Serial Number (DSN)**
+2. **Install Visual Studio Code**:
 
-If your donor device has a **Device Serial Number (DSN)**, incorporating it into the firmware enhances the emulation's fidelity.
+   - Download from [Visual Studio Code](https://code.visualstudio.com/).
+   - Install necessary extensions for Verilog/SystemVerilog support.
 
-1. **Locate the DSN Field**
-   - **Steps**:
-     1. In `pcileech_pcie_cfg_a7.sv`, search for `rw[127:64]`.
-     2. This field represents the `cfg_dsn` (Configuration Space Device Serial Number).
+3. **Clone the PCILeech-FPGA Repository**:
 
-2. **Insert the DSN**
-   - **Steps**:
-     1. Replace the placeholder with your donor device's DSN:
-        ```verilog
-        rw[127:64] <= 64'hXXXXXXXX_YYYYYYYY;  // Replace Xs and Ys with donor DSN
-        ```
-     2. **Example**:
-        - **Donor DSN**: Upper DW: `01 00 00 00`, Lower DW: `68 4C E0 00`
-        - **Combined DSN**: `64'h01000000684CE000`
-        ```verilog
-        rw[127:64] <= 64'h01000000684CE000;  // Donor DSN
-        ```
+   ```bash
+   git clone https://github.com/ufrisk/pcileech-fpga.git
+   cd pcileech-fpga
+   ```
 
-     - **No DSN Available**:
-       ```verilog
-       rw[127:64] <= 64'h0000000000000000;  // No DSN
-       ```
+4. **Set Up a Clean Development Environment**:
 
-3. **Save Changes**
-   - **Steps**:
-     1. After modifying the DSN, save the file to retain changes.
+   - Use a dedicated machine or virtual environment.
+   - Ensure no conflicts with other FPGA projects.
 
 ---
 
-## **7. Vivado Project Setup and Customization**
+## **6. Gathering Donor Device Information**
 
-After customizing the configuration space, integrate these changes into the Vivado project to prepare the firmware for synthesis and implementation.
+Accurate emulation requires detailed information from the donor device.
 
-### **7.1 Generating Vivado Project Files**
+### **6.1 Using PCIe Device Scanning Tools**
 
-1. **Open Vivado**
-   - **Steps**:
-     1. Launch **Vivado** on your development machine.
-     2. Ensure Vivado is properly installed and configured for your FPGA device.
+#### **Option 1: Using Arbor**
 
-2. **Access the Tcl Console**
-   - **Steps**:
-     1. In Vivado, locate the **Tcl Console** at the bottom of the application window.
-     2. If not visible, navigate to **Window > Tcl Console** to display it.
+1. **Install Arbor**:
 
-3. **Navigate to the PCIeSquirrel Directory**
-   - **Steps**:
-     1. In the Tcl Console, determine your current directory:
-        ```tcl
-        pwd
-        ```
-     2. Change the directory to the `PCIeSquirrel` folder within the cloned `pcileech-fpga` repository:
-        ```tcl
-        cd C:/Users/YourUsername/Desktop/pcileech-fpga/PCIeSquirrel
-        ```
-        *Replace `YourUsername` and the path as per your setup.*
+   - Download from [Arbor Download Page](https://www.mindshare.com/software/Arbor).
+   - Install and launch the application.
 
-     - **Note**: If you encounter errors with backslashes (`\`), use forward slashes (`/`):
-       ```tcl
-       cd C:/Users/YourUsername/Desktop/pcileech-fpga/PCIeSquirrel
-       ```
+2. **Scan for PCIe Devices**:
 
-4. **Generate the Vivado Project**
-   - **Steps**:
-     1. In the Tcl Console, execute the project generation script:
-        ```tcl
-        source vivado_generate_project.tcl -notrace
-        ```
-     2. Wait for the script to complete. This process sets up the Vivado project with the necessary configurations.
+   - Navigate to the **Local System** tab.
+   - Click **Scan/Rescan**.
 
-5. **Open the Generated Project**
-   - **Steps**:
-     1. Upon successful generation, Vivado should automatically open the `.xpr` (Vivado Project) file.
-     2. Keep the project open for further customization.
+3. **Select Donor Device**:
 
-### **7.2 Modifying IP Blocks**
+   - Locate your device in the list.
+   - View detailed configuration.
 
-1. **Access the PCIe IP Core**
-   - **Steps**:
-     1. In the **Sources** pane, navigate to:
-        ```
-        pcileech_squirrel_top > i_pcileech_pcie_a7 : pcileech_pcie_a7
-        ```
-     2. Double-click on the PCIe IP core (`i_pcie_7x_0 : pcie_7x_0`) to open the **Re-customize IP** window.
+#### **Option 2: Using `lspci` (Linux)**
 
-2. **Customize Device IDs and BARs**
-   - **Steps**:
-     1. In the **Re-customize IP** dialog, navigate to the **IDs** tab.
-     2. Enter the **Device ID**, **Vendor ID**, and **Subsystem ID** gathered from the donor device.
-     3. Verify the **Class Code**:
-        - Go back to Arbor or your scanning tool to determine the class code of your donor device.
-        - In the **Re-customize IP** window, set the class code accordingly to match the donor device.
-     4. **Example**:
-        - **Device ID**: `0x1234`
-        - **Vendor ID**: `0xABCD`
-        - **Subsystem ID**: `0x5678`
-        - **Class Code**: `0x020000` (e.g., Network Controller)
+1. **Open Terminal**.
 
-3. **Configure BAR Sizes**
-   - **Steps**:
-     1. Navigate to the **BARs** tab within the **Re-customize IP** dialog.
-     2. Set the **BAR0 Size** to match the donor device's BAR0 size.
-        - **Example**: If the donor's BAR0 is 16KB:
-          ```tcl
-          BAR0 Size: 16KB
-          ```
-     3. Repeat for additional BARs (BAR1, BAR2, etc.) if the donor device utilizes them.
+2. **List PCI Devices**:
 
-4. **Finalize IP Customization**
-   - **Steps**:
-     1. After setting all necessary parameters, click **OK** to apply the changes.
-     2. Vivado may prompt to regenerate the IP core; confirm and allow the process to complete.
+   ```bash
+   lspci -vvv
+   ```
 
-5. **Lock the IP Core**
-   - **Purpose**: Prevent Vivado from overwriting manual configurations during synthesis.
-   - **Steps**:
-     1. Open the **Tcl Console** within Vivado.
-     2. Execute the following command to lock the IP core:
-        ```tcl
-        set_property is_managed false [get_files pcie_7x_0.xci]
-        ```
-     3. **To Unlock** (if needed in the future):
-        ```tcl
-        set_property is_managed true [get_files pcie_7x_0.xci]
-        ```
+3. **Identify Donor Device**:
+
+   - Find the device by name or class.
+
+4. **Extract Information**:
+
+   - Note down **Device ID**, **Vendor ID**, **Subsystem ID**, etc.
+
+#### **Option 3: Using PCI-Z (Windows)**
+
+1. **Download PCI-Z** from [PCI-Z Download Page](https://www.pci-z.com/).
+
+2. **Run PCI-Z**.
+
+3. **Identify Donor Device**:
+
+   - Locate the device in the list.
+
+4. **Extract Information**:
+
+   - Record necessary attributes.
+
+### **6.2 Extracting and Recording Device Attributes**
+
+Ensure you collect the following:
+
+- **Device ID** (e.g., `0x1234`)
+- **Vendor ID** (e.g., `0xABCD`)
+- **Subsystem ID** (e.g., `0x5678`)
+- **Revision ID**
+- **BARs**:
+
+  - Number of BARs.
+  - Type (Memory or I/O).
+  - Size.
+
+- **Capabilities**:
+
+  - MSI/MSI-X support.
+  - Power Management.
+  - PCIe link speed and width.
+
+- **Device Serial Number (DSN)** (if available).
 
 ---
 
-## **8. Advanced Firmware Customization**
+## **7. Initial Firmware Customization**
 
-To achieve precise 1:1 emulation, further customize PCIe parameters, BARs, memory mapping, power management, and interrupt handling.
+### **7.1 Modifying Configuration Space**
 
-### **8.1 Configuring PCIe Parameters for Emulation**
+1. **Open `pcileech_pcie_cfg_a7.sv`** in Visual Studio Code.
 
-1. **Match PCIe Link Speed and Width**
-   - **Importance**: Ensures the emulated device communicates at the same speed and width as the donor device.
-   - **Steps**:
-     1. In `pcileech_pcie_cfg_a7.sv`, locate the PCIe link speed and width configurations.
-     2. Update these parameters to match the donor device's specifications.
-        ```verilog
-        pcie_link_speed <= 4'bXXXX;   // Replace XXXX with donor's PCIe link speed
-        pcie_link_width <= 8'b00000YYY; // Replace YYY with donor's PCIe link width
-        ```
-     - **Example**:
-       - **Donor PCIe Link Speed**: Gen2 (5 GT/s)
-       - **Donor PCIe Link Width**: x4
-         ```verilog
-         pcie_link_speed <= 4'b0010;   // Gen2
-         pcie_link_width <= 8'b00000100; // x4
-         ```
+2. **Modify Device and Vendor IDs**:
 
-2. **Set Capability Pointers**
-   - **Purpose**: Ensure the PCIe capabilities are correctly linked and recognized by the host system.
-   - **Steps**:
-     1. Locate the capability pointer configurations in `pcileech_pcie_cfg_a7.sv`.
-     2. Set the capability pointers to match the donor device's configuration.
-        ```verilog
-        capability_pointer <= 8'h40;   // Example value; replace with donor's capability pointer
-        ```
+   ```verilog
+   cfg_deviceid <= 16'h1234; // Replace with donor Device ID
+   cfg_vendorid <= 16'hABCD; // Replace with donor Vendor ID
+   ```
 
-3. **Modify Extended Capabilities**
-   - **Steps**:
-     1. Add or adjust extended capabilities such as **Advanced Error Reporting (AER)**, **Device Serial Number (DSN)**, and others as supported by the donor device.
-     2. Ensure that the capability IDs and pointers are correctly set.
+3. **Modify Subsystem IDs**:
 
-### **8.2 Adjusting BARs and Memory Mapping**
+   ```verilog
+   cfg_subsysid <= 16'h5678; // Replace with donor Subsystem ID
+   cfg_subsysvid <= 16'hABCD; // Typically same as Vendor ID
+   ```
 
-Accurate memory mapping is critical for emulating hardware devices. Base Address Registers (BARs) define where the device's memory and registers appear in system memory space.
+4. **Adjust Class Codes and Revision IDs**:
 
-1. **Set BAR Sizes**
-   - **Steps**:
-     1. In `pcileech_pcie_cfg_a7.sv`, locate the BAR size assignments.
-     2. Set the BAR sizes to match those of the donor device.
-        ```verilog
-        bar0_size <= 32'h00004000;  // 16KB for BAR0
-        bar1_size <= 32'h00008000;  // 32KB for BAR1 (if applicable)
-        ```
+   ```verilog
+   cfg_rev_id <= 8'h01;      // Replace with donor Revision ID
+   cfg_class_code <= 24'h020000; // Example for Network Controller
+   ```
 
-2. **Define BAR Address Spaces**
-   - **Steps**:
-     1. Ensure the BAR address spaces do not overlap and match the donor device's memory layout.
-     2. Use the recorded BAR sizes to set the address ranges appropriately.
-        ```verilog
-        bar0_addr <= 32'hF0000000;  // Example address; replace with donor's BAR0 address
-        bar1_addr <= 32'hF0004000;  // Example address; replace as needed
-        ```
+5. **Configure BARs**:
 
-3. **Handle Multiple BARs**
-   - **Steps**:
-     1. If the donor device uses multiple BARs, repeat the configuration for each BAR.
-     2. Ensure each BAR's size and address align with the donor device's specifications.
+   - Set the number, type, and size of BARs.
 
-### **8.3 Emulating Device Power Management and Interrupts**
+   ```verilog
+   cfg_bar_0 <= 32'hFFFFFFF0; // 32-bit Memory BAR
+   // Set other BARs as needed
+   ```
 
-Properly emulating power management and interrupt handling ensures the host system interacts seamlessly with the emulated device.
+### **7.2 Inserting the Device Serial Number (DSN)**
 
-1. **Power Management (PM) Configuration**
-   - **Steps**:
-     1. In `pcileech_pcie_cfg_a7.sv`, locate the Power Management capability settings.
-     2. Set the PM capabilities to match the donor device.
-        ```verilog
-        PM_CAP_VERSION <= 4'b0011;       // Example version; replace with donor's PM version
-        PM_CAP_D1SUPPORT <= 1'b1;        // Enable D1 support if the donor does
-        PM_CAP_AUXCURRENT <= 3'b100;     // Example value; adjust as per donor
-        PM_CSR_NOSOFTRST <= 1'b0;        // Example value; adjust as needed
-        ```
+1. **Locate DSN Configuration**:
 
-2. **MSI/MSI-X (Interrupts) Configuration**
-   - **Steps**:
-     1. Locate MSI/MSI-X configuration in `pcileech_pcie_cfg_a7.sv`.
-     2. Enable and configure MSI/MSI-X to handle interrupts correctly.
-        ```verilog
-        MSI_CAP_64_BIT_ADDR_CAPABLE <= 1'b1;  // Enable 64-bit MSI if supported
-        cfg_interrupt <= 1'b1;                // Enable MSI interrupts
-        ```
+   ```verilog
+   cfg_dsn <= 64'h01000000684CE000; // Replace with donor DSN
+   ```
 
-3. **Implementing Interrupt Handling Logic**
-   - **Steps**:
-     1. In `pcileech_pcie_cfg_a7.sv`, ensure the interrupt signals are correctly routed.
-        ```verilog
-        assign cfg_interrupt_di = cfg_int_di;
-        assign cfg_interrupt_assert = cfg_int_assert;
-        ```
-     2. Test interrupt functionality to ensure the host system correctly receives and handles interrupts from the emulated device.
+2. **If DSN is Unavailable**:
+
+   - You may generate a unique DSN or use zeros.
+
+   ```verilog
+   cfg_dsn <= 64'h0000000000000000;
+   ```
 
 ---
 
-## **9. Emulating Device-Specific Capabilities**
+## **8. Vivado Project Setup and Customization**
 
-To achieve a true 1:1 emulation, it's essential to replicate the unique capabilities of the donor device beyond basic PCIe interactions.
+### **8.1 Generating Vivado Project Files**
 
-### **9.1 Implementing Advanced PCIe Capabilities**
+1. **Open Vivado**.
 
-Most PCIe devices support advanced features like **Advanced Error Reporting (AER)**, **Link Speed Negotiation**, and **Extended Capabilities**. Emulating these ensures the host system perceives the emulated device as identical to the donor.
+2. **Launch Tcl Console**.
 
-1. **Advanced Error Reporting (AER)**
-   - **Steps**:
-     1. In `pcileech_pcie_cfg_a7.sv`, locate AER configurations.
-     2. Enable AER if supported by the donor device.
-        ```verilog
-        AER_CAP_VERSION <= 4'b0001;   // Example version; replace with donor's AER version
-        AER_CAP_NEXTPTR <= 8'h00;     // Set next pointer appropriately
-        ```
-     3. Implement error handling logic to manage AER-related events.
+3. **Navigate to Project Directory**:
 
-2. **Link Speed Negotiation**
-   - **Steps**:
-     1. Ensure the PCIe link speed and width negotiation matches the donor device.
-     2. Adjust link speed settings as previously outlined in **8.1**.
+   ```tcl
+   cd C:/path/to/pcileech-fpga/PCIeSquirrel
+   ```
 
-3. **Extended Capabilities**
-   - **Steps**:
-     1. Identify any extended capabilities used by the donor device (e.g., Vendor-Specific Extended Capabilities, Latency Tolerance Reporting).
-     2. Implement these capabilities within `pcileech_pcie_cfg_a7.sv` by defining the appropriate registers and logic.
-        ```verilog
-        // Example for Vendor-Specific Extended Capability
-        VSEC_CAP_ID <= 16'h1234;       // Replace with vendor-specific ID
-        VSEC_CAP_VERSION <= 4'h1;      // Replace with version
-        VSEC_CAP_NEXTPTR <= 12'h000;   // Next capability pointer
-        ```
+4. **Generate Project**:
 
-### **9.2 Emulating Vendor-Specific Features**
+   ```tcl
+   source vivado_generate_project_squirrel.tcl -notrace
+   ```
 
-Some devices incorporate proprietary or vendor-specific features that must be accurately emulated to ensure seamless integration.
+### **8.2 Modifying IP Blocks**
 
-1. **Identify Vendor-Specific Features**
-   - **Steps**:
-     1. Use PCIe traffic analysis tools (e.g., Wireshark with PCIe extensions, Teledyne LeCroy) to monitor vendor-specific TLPs.
-     2. Document unique registers, commands, or behaviors exhibited by the donor device.
+1. **Open the PCIe IP Core Configuration**:
 
-2. **Implementing Vendor-Specific Logic**
-   - **Steps**:
-     1. In `pcileech_pcie_cfg_a7.sv`, add logic to handle vendor-specific features.
-        ```verilog
-        // Example: Vendor-Specific Register
-        reg [31:0] vendor_specific_reg;
-        always @(posedge clk) begin
-          if (vendor_specific_write_enable) begin
-            vendor_specific_reg <= vendor_specific_data_in;
-          end
-        end
-        ```
-     2. Ensure that any proprietary commands or responses are accurately replicated.
+   - In Vivado, go to **Sources** > **pcileech_squirrel_top**.
+   - Locate **`pcie_7x_0`**.
+   - Right-click and select **Customize IP**.
 
-3. **Testing Vendor-Specific Features**
-   - **Steps**:
-     1. Use vendor-specific drivers or applications to interact with the emulated device.
-     2. Verify that all proprietary features function as expected.
+2. **Modify Device IDs**:
+
+   - Enter the **Device ID** and **Vendor ID** from your donor device.
+
+3. **Configure BARs**:
+
+   - Match the BAR configuration to the donor device.
+
+4. **Set Class Codes and Revision IDs**:
+
+   - Ensure these match the donor device.
+
+5. **Lock the IP Core**:
+
+   - Prevents Vivado from overwriting changes during synthesis.
+
+   ```tcl
+   set_property is_managed false [get_files pcie_7x_0.xci]
+   ```
 
 ---
 
-## **10. Transaction Layer Packet (TLP) Emulation**
+## **9. Building, Flashing, and Testing**
 
-Accurate emulation of Transaction Layer Packets (TLPs) is vital for ensuring the FPGA-based device communicates seamlessly with the host system, mimicking the behavior of the donor device.
+### **9.1 Synthesis and Implementation**
 
-### **10.1 Understanding and Capturing TLPs**
+1. **Run Synthesis**:
 
-TLPs are the fundamental units of PCIe communication, handling memory reads/writes, configuration accesses, and interrupt signaling.
+   - In Vivado, click **Run Synthesis**.
+   - Resolve any errors.
 
-1. **Capture TLPs from the Donor Device**
-   - **Steps**:
-     1. Use PCIe analysis tools like **Teledyne LeCroy’s Telescan PE** or **Wireshark** with PCIe support to monitor TLPs generated by the donor device.
-     2. Record the structure, types, and patterns of TLPs used by the donor device during typical operations.
+2. **Run Implementation**:
 
-2. **Analyze TLP Structure**
-   - **Components of a TLP**:
-     - **Header Fields**: Define the type, format, address, and other control information.
-     - **Data Payload**: The actual data being transferred.
-     - **Tail Fields**: Additional information such as byte counts and sequence numbers.
+   - Click **Run Implementation**.
+   - Ensure timing constraints are met.
 
-   - **Example TLP Structure**:
-     ```verilog
-     tlp_header <= {fmt, type, traffic_class, td, ep, attr, length};
-     tlp_address <= address;
-     tlp_data <= data_payload;
-     ```
+3. **Generate Bitstream**:
 
-3. **Emulating Legitimate Traffic**
-   - **Steps**:
-     1. Ensure that TLPs generated by the FPGA match those captured from the donor device in terms of type, address, length, and data.
-     2. Implement logic to handle different types of TLPs, such as memory writes, memory reads, and configuration accesses.
+   - Click **Generate Bitstream**.
+   - Wait for completion.
 
-### **10.2 Crafting Custom TLPs for Specific Operations**
+### **9.2 Flashing the Bitstream**
 
-To accurately mimic the donor device, you must craft custom TLPs that replicate its behavior during various operations.
+1. **Connect FPGA via JTAG**.
 
-1. **Memory Write TLP Example**
-   - **Description**: Represents a write operation to system memory.
-   - **Verilog Example**:
-     ```verilog
-     // TLP Header for Memory Write
-     tlp_header <= {2'b10, 5'b00000, 3'b000, 1'b0, 1'b0, 2'b00, 10'b0000000001}; // Fmt, Type, etc.
-     // Address and Data
-     tlp_address <= 64'h0000_0000_1234_5678; // Target address
-     tlp_data <= 32'hDEADBEEF;               // Data to write
-     ```
+2. **Open Hardware Manager**:
 
-2. **Memory Read TLP Example**
-   - **Description**: Represents a read operation from system memory.
-   - **Verilog Example**:
-     ```verilog
-     // TLP Header for Memory Read
-     tlp_header <= {2'b00, 5'b00000, 3'b000, 1'b0, 1'b0, 2'b00, 10'b0000000001}; // Fmt, Type, etc.
-     // Address
-     tlp_address <= 64'h0000_0000_1234_5678; // Target address
-     ```
+   - In Vivado, click **Open Hardware Manager**.
 
-3. **Configuration Access TLP Example**
-   - **Description**: Represents a configuration space access.
-   - **Verilog Example**:
-     ```verilog
-     // TLP Header for Configuration Write
-     tlp_header <= {2'b10, 5'b00101, 3'b000, 1'b0, 1'b0, 2'b00, 10'b0000000001}; // Fmt, Type, etc.
-     // Address and Data
-     tlp_address <= 32'h00000010;            // Configuration register address
-     tlp_data <= 32'h0000_0001;              // Data to write
-     ```
+3. **Program Device**:
 
-4. **Interrupt Signaling TLP Example**
-   - **Description**: Represents an interrupt signaling to the CPU.
-   - **Verilog Example**:
-     ```verilog
-     // MSI Interrupt TLP
-     // Format and Type for MSI: 2'b10 (3DW Data), 5'b10100 (Message Signaled Interrupt)
-     tlp_header <= {2'b10, 5'b10100, 3'b000, 1'b0, 1'b0, 2'b00, 10'b0000000001};
-     // MSI Address and Data
-     tlp_address <= 64'hFFFF_FFFF_FFFF_FFFF; // MSI address (as per specification)
-     tlp_data <= 32'h0000_0001;              // MSI data payload
-     ```
+   - Right-click on the FPGA device.
+   - Select **Program Device**.
+   - Choose the generated bitstream file.
+   - Click **Program**.
 
-5. **Implement TLP Handlers**
-   - **Steps**:
-     1. In your firmware, implement handlers for different TLP types to ensure correct processing and response.
-     2. Use state machines or logic blocks to manage TLP generation, processing, and response handling.
+### **9.3 Testing and Validation**
 
-6. **Testing TLPs**
-   - **Steps**:
-     1. Use simulation tools or test benches to verify the correctness of the TLPs.
-     2. Capture and analyze TLPs during operation to ensure they match expected patterns.
+1. **Verify Device Detection**:
+
+   - Use **Device Manager** (Windows) or `lspci` (Linux) to check if the device is recognized as the donor device.
+
+2. **Functional Testing**:
+
+   - Install drivers if necessary.
+   - Test basic functionality (e.g., network connectivity for a network card).
+
+3. **Performance Testing**:
+
+   - Use benchmarking tools to assess performance.
 
 ---
 
-## **11. Building, Flashing, and Testing**
+## **10. Troubleshooting**
 
-After customizing the firmware and ensuring all configurations align with the donor device, proceed to build, flash, and test the firmware on your FPGA device.
+### **10.1 Device Detection Issues**
 
-### **11.1 Synthesis and Implementation**
+- **Check Physical Connections**.
+- **Verify Configuration Settings**.
+- **Ensure BIOS/UEFI Settings Allow DMA Operations**.
 
-1. **Run Synthesis**
-   - **Steps**:
-     1. In Vivado, click on **Run Synthesis**.
-     2. Monitor the synthesis process for any warnings or errors.
-     3. Address any critical issues before proceeding.
+### **10.2 Memory Mapping and BAR Configuration Errors**
 
-2. **Run Implementation**
-   - **Steps**:
-     1. After successful synthesis, initiate **Run Implementation**.
-     2. Ensure that the implementation phase completes without critical warnings.
-     3. Review the implementation report for any potential issues.
+- **Confirm BAR Sizes and Addresses**.
+- **Ensure Proper Memory Alignment**.
+- **Check for Overlapping Memory Regions**.
 
-3. **Generate Bitstream**
-   - **Steps**:
-     1. Once implementation is complete, click on **Generate Bitstream**.
-     2. Confirm any prompts to generate the bitstream.
-     3. Wait for the bitstream generation to finish successfully.
+### **10.3 DMA Performance and TLP Errors**
 
-   - **Alternative via Tcl Console**:
-     ```tcl
-     source vivado_build.tcl -notrace
-     ```
-
-   - **Note**: The generated bitstream file (`.bit` or `.bin`) is typically located in the `impl_1` directory within your project folder.
-
-### **11.2 Flashing the Bitstream**
-
-1. **Connect FPGA via JTAG**
-   - **Steps**:
-     1. Ensure your FPGA device is connected to the host system via the JTAG interface.
-     2. Power on the FPGA device.
-
-2. **Open Vivado Hardware Manager**
-   - **Steps**:
-     1. In Vivado, navigate to **Open Hardware Manager**.
-     2. Click **Open Target > Auto Connect** to detect the connected FPGA device.
-
-3. **Program the FPGA**
-   - **Steps**:
-     1. In the Hardware Manager, right-click on the detected device and select **Program Device**.
-     2. Browse to the generated bitstream file (`pcileech_squirrel_top.bit` or similar).
-     3. Click **Program** to flash the firmware onto the FPGA.
-     4. Confirm successful programming via the Hardware Manager console.
-
-4. **Alternative Flashing Methods**
-   - **For Specific Devices**: Follow the manufacturer's instructions or use provided utilities for devices like **Squirrel** or **EnigmaX1**.
-   - **Command-Line Tools**: Use tools like **xc3sprog** or **OpenOCD** for programming via command line.
-
-### **11.3 Testing and Validation**
-
-1. **Verify Device Detection**
-   - **Steps**:
-     1. Use **Device Manager** (on Windows) or **lspci** (on Linux) to verify that the FPGA is detected as the donor device.
-     2. Confirm that the **Device ID**, **Vendor ID**, **Subsystem ID**, and **BARs** match the donor device's specifications.
-
-   - **Example (Linux)**:
-     ```bash
-     lspci -vvv -s <PCI address>
-     ```
-
-2. **Memory Mapping Test**
-   - **Steps**:
-     1. Access the device's **BARs** to ensure correct memory mapping.
-     2. Use memory access tools or simple read/write operations to test responsiveness.
-
-3. **Interrupts Test**
-   - **Steps**:
-     1. Trigger interrupts through the emulated device.
-     2. Verify that the host system correctly receives and handles these interrupts.
-     3. Use system logs or diagnostic tools to confirm interrupt handling.
-
-4. **Performance Testing**
-   - **Steps**:
-     1. Run DMA speed test tools to measure data transfer rates.
-     2. Compare performance metrics against expected values to ensure firmware stability and efficiency.
-
-   - **Example Tools**:
-     - **PCILeech DMA Speed Test**: Available within the PCILeech toolset.
-     - **Custom Benchmark Scripts**: Scripts that perform read/write operations to measure performance.
-
-5. **Configuration Space Validation**
-   - **Steps**:
-     1. Use diagnostic tools to inspect the PCIe configuration space.
-     2. Ensure all fields (Device ID, Vendor ID, BARs, Capabilities) are correctly set and match the donor device.
-
-   - **Example (Windows)**:
-     - Use **Arbor** or **Telescan PE** to read the configuration space and compare it to the donor device.
+- **Optimize FIFO Sizes**.
+- **Adjust TLP Payload Sizes**.
+- **Review PCIe Link Settings**.
 
 ---
 
-## **12. Advanced Debugging Techniques**
-
-When developing custom firmware, encountering issues is common. Advanced debugging techniques can help identify and resolve these problems effectively.
-
-### **12.1 Using Vivado's Integrated Logic Analyzer**
-
-Vivado's **Integrated Logic Analyzer (ILA)** allows real-time monitoring of internal FPGA signals, aiding in debugging and verification.
-
-1. **Set Up ILA Probes**
-   - **Steps**:
-     1. In Vivado, navigate to **Tools > Insert Logic Analyzer**.
-     2. Select signals of interest, such as TLP data paths or state machine outputs.
-     3. Configure the ILA core settings, including trigger conditions and data depth.
-
-   - **Example**:
-     ```verilog
-     ila_0 : ila
-       generic map (
-         C_PROBE_WIDTH => 128  -- Width of the data probe
-       )
-       port map (
-         clk     => clk,       -- Clock signal
-         probe0  => tlp_data   -- Signal to monitor
-       );
-     ```
-
-2. **Configure Triggers**
-   - **Steps**:
-     1. Open the **ILA** configuration dialog.
-     2. Set trigger conditions based on specific events, such as TLP generation or memory access.
-     3. Adjust trigger levels and qualifiers to capture relevant data.
-
-3. **Analyze Signal Waveforms**
-   - **Steps**:
-     1. Run the FPGA with the ILA probes enabled.
-     2. Use Vivado’s **Waveform Viewer** to examine captured signal waveforms.
-     3. Identify timing issues, incorrect logic states, or unexpected behaviors.
-
-   - **Benefits**:
-     - Real-time visibility into internal signals.
-     - Ability to capture and analyze transient issues during TLP processing.
-
-### **12.2 PCIe Traffic Analysis Tools**
-
-Beyond Vivado's ILA, external PCIe traffic analysis tools provide in-depth insights into PCIe communications between the FPGA and the host system.
-
-1. **Wireshark with PCIe Extensions**
-   - **Description**: Wireshark can capture and analyze PCIe traffic with the appropriate extensions or plugins.
-   - **Steps**:
-     1. Install Wireshark with PCIe support.
-     2. Configure Wireshark to capture PCIe traffic.
-     3. Analyze captured TLPs to ensure they align with expected donor device behavior.
-
-2. **Teledyne LeCroy Telescan PE**
-   - **Description**: A professional-grade PCIe traffic analysis tool offering comprehensive PCIe traffic monitoring and analysis capabilities.
-   - **Steps**:
-     1. Install Teledyne LeCroy’s Telescan PE.
-     2. Connect it to your system to monitor PCIe traffic.
-     3. Use it to capture and dissect TLPs exchanged between the FPGA and host system.
-
-3. **Total Phase Beagle**
-   - **Description**: A PCIe traffic analyzer that allows for real-time capture and analysis of PCIe communications.
-   - **Steps**:
-     1. Set up the Total Phase Beagle PCIe analyzer with your system.
-     2. Configure it to monitor and capture PCIe traffic.
-     3. Use its analysis features to verify TLP integrity and behavior.
-
-**Benefits of Using PCIe Traffic Analysis Tools**:
-
-- **Comprehensive TLP Analysis**: Detailed inspection of TLPs to ensure accurate emulation.
-- **Error Detection**: Identify malformed TLPs or unexpected transaction patterns.
-- **Performance Metrics**: Measure data transfer rates and identify bottlenecks.
+# **Part 2: Advanced Tutorials**
 
 ---
 
-## **13. Troubleshooting**
+## **11. Advanced Firmware Customization**
 
-Encountering issues during firmware development is common. This section provides solutions to common problems you may face during the emulation process.
+### **11.1 Configuring PCIe Parameters for Emulation**
 
-### **13.1 Device Detection Issues**
+1. **Match PCIe Link Speed and Width**:
 
-**Problem**: The host system fails to detect the FPGA as the donor device.
+   - In `pcileech_pcie_cfg_a7.sv`, set `pcie_link_speed` and `pcie_link_width`.
 
-**Solutions**:
+   ```verilog
+   pcie_link_speed <= 4'b0010;   // Gen2 (5 GT/s)
+   pcie_link_width <= 8'b00000100; // x4 lanes
+   ```
 
-1. **Verify Device IDs**
-   - **Steps**:
-     1. Double-check that the **Device ID**, **Vendor ID**, and **Subsystem ID** in the firmware match those of the donor device.
-     2. Ensure there are no typos or incorrect values in the configuration space.
+2. **Set Capability Pointers**:
 
-2. **Check PCIe Link Training**
-   - **Steps**:
-     1. Use PCIe diagnostic tools to verify that the PCIe link is properly trained.
-     2. Ensure that the link speed and width configurations match the donor device.
+   - Adjust `capability_pointer` to match the donor device.
 
-3. **Ensure Correct BAR Configuration**
-   - **Steps**:
-     1. Confirm that the **BAR sizes** and **address ranges** are accurately set.
-     2. Ensure no overlapping or conflicting BAR configurations.
+   ```verilog
+   capability_pointer <= 8'h40;
+   ```
 
-4. **Power and Connection Check**
-   - **Steps**:
-     1. Ensure the FPGA device is properly connected and powered.
-     2. Re-seat the PCIe card to ensure a secure connection.
+3. **Modify Extended Capabilities**:
 
-### **13.2 Memory Mapping and BAR Configuration Errors**
+   - Implement capabilities like AER, LTR, etc.
 
-**Problem**: Incorrect memory mapping leads to failed or inaccurate memory access.
+### **11.2 Adjusting BARs and Memory Mapping**
 
-**Solutions**:
+1. **Set BAR Sizes**:
 
-1. **Double-Check BAR Sizes and Addresses**
-   - **Steps**:
-     1. Verify that each BAR size in the firmware matches the donor device's configuration.
-     2. Ensure that BAR address spaces are correctly set and do not overlap.
+   ```verilog
+   bar0_size <= 32'h00004000; // 16KB for BAR0
+   ```
 
-2. **Use Diagnostic Tools**
-   - **Steps**:
-     1. Utilize tools like **lspci** or **Arbor** to inspect the PCIe configuration space.
-     2. Confirm that the BARs are correctly mapped and accessible.
+2. **Define BAR Address Spaces**:
 
-3. **Adjust Memory Regions**
-   - **Steps**:
-     1. If memory regions are not accessible, adjust the BAR configurations to better match the system's memory map.
-     2. Ensure that the firmware logic correctly handles memory read/write operations.
+   - Ensure addresses do not overlap.
 
-### **13.3 DMA Performance and TLP Errors**
+3. **Handle Multiple BARs**:
 
-**Problem**: Slow DMA performance or errors related to Transaction Layer Packets (TLPs).
+   - Configure additional BARs as needed.
 
-**Solutions**:
+### **11.3 Emulating Device Power Management and Interrupts**
 
-1. **Optimize TLP Generation**
-   - **Steps**:
-     1. Ensure that TLPs are correctly formatted and free of errors.
-     2. Use Vivado’s ILA and PCIe traffic analysis tools to identify and rectify malformed TLPs.
+1. **Power Management (PM) Configuration**:
 
-2. **Adjust Payload Sizes**
-   - **Steps**:
-     1. Set the maximum read request and payload sizes to 4KB or the highest supported by the donor device.
-        ```verilog
-        max_read_request_size <= 3'b101;  // 4KB
-        max_payload_size <= 3'b101;       // 4KB
-        ```
-     2. Avoid setting payload sizes beyond what the donor device supports to prevent system instability.
+   - Implement PM capabilities.
 
-3. **Check PCIe Link Settings**
-   - **Steps**:
-     1. Verify that the PCIe link speed and width are correctly configured.
-     2. Ensure that the FPGA is negotiating the link parameters accurately with the host system.
+   ```verilog
+   PM_CAP_VERSION <= 4'b0011;
+   PM_CAP_D1SUPPORT <= 1'b1;
+   ```
 
-4. **Firmware Integrity**
-   - **Steps**:
-     1. Review and validate all recent changes to the firmware to ensure no unintended modifications were introduced.
-     2. Revert to a known stable firmware version if performance issues persist.
+2. **MSI/MSI-X Configuration**:
+
+   - Enable and configure MSI/MSI-X interrupts.
+
+   ```verilog
+   MSI_CAP_64_BIT_ADDR_CAPABLE <= 1'b1;
+   cfg_interrupt <= 1'b1;
+   ```
+
+3. **Implement Interrupt Handling Logic**:
+
+   - Ensure correct routing of interrupt signals.
 
 ---
 
-## **14. Emulation Accuracy and Optimizations**
+## **12. Emulating Device-Specific Capabilities**
 
-Ensuring the emulation's accuracy is critical for seamless integration and undetectable behavior. This section outlines techniques to enhance emulation precision and optimize performance.
+### **12.1 Implementing Advanced PCIe Capabilities**
 
-### **14.1 Techniques for Accurate Timing Emulation**
+1. **Advanced Error Reporting (AER)**:
 
-Matching the donor device's timing characteristics ensures that the host system interacts with the emulated device as if it were the original hardware.
+   - Enable and configure AER in the firmware.
 
-1. **Use Matching Clock Domains**
-   - **Steps**:
-     1. Ensure that the FPGA’s clock matches the PCIe link’s clock rate.
-     2. Synchronize internal clocks within the FPGA to align with PCIe timing requirements.
+   ```verilog
+   AER_CAP_VERSION <= 4'b0001;
+   ```
 
-2. **Control Response Latency**
-   - **Steps**:
-     1. Implement registers or counters to manage response times for TLP acknowledgments and interrupt handling.
-     2. Ensure that the latency in responses matches the donor device’s typical response times.
+2. **Latency Tolerance Reporting (LTR)**:
 
-3. **Implement Pipeline Stages**
-   - **Steps**:
-     1. Use pipelining in the FPGA design to align with the donor device’s data processing stages.
-     2. This reduces latency and ensures timely TLP generation and processing.
+   - Implement LTR if supported by the donor device.
 
-### **14.2 Dynamic Response to System Calls**
+   ```verilog
+   LTR_CAP_SUPPORTED <= 1'b1;
+   ```
 
-Emulating dynamic device behavior based on system interactions ensures the FPGA device responds appropriately under various conditions.
+### **12.2 Emulating Vendor-Specific Features**
 
-1. **Implement State Machines**
-   - **Steps**:
-     1. Design state machines within the FPGA to manage different operational states of the emulated device.
-     2. Ensure transitions between states mimic the donor device’s behavior based on system calls and interactions.
+1. **Identify Vendor-Specific Features**:
 
-2. **Track and Respond to System Requests**
-   - **Steps**:
-     1. Monitor incoming system requests and adjust the device’s responses dynamically.
-     2. Ensure that the FPGA firmware can handle varying workloads and respond accurately to different types of TLPs.
+   - Use PCIe traffic analyzers to capture unique behaviors.
 
-3. **Handle Asynchronous Events**
-   - **Steps**:
-     1. Implement logic to manage asynchronous events such as interrupts or error conditions.
-     2. Ensure that the firmware can generate and respond to these events in a manner consistent with the donor device.
+2. **Implement Vendor-Specific Logic**:
+
+   - Add custom registers and handling in the firmware.
+
+3. **Testing**:
+
+   - Use vendor-specific drivers or applications to validate functionality.
 
 ---
 
-## **15. Best Practices for Firmware Development**
+## **13. Transaction Layer Packet (TLP) Emulation**
 
-Adhering to best practices ensures the development process is efficient, maintainable, and secure.
+### **13.1 Understanding and Capturing TLPs**
 
-### **15.1 Continuous Testing and Documentation**
+1. **Use PCIe Traffic Analyzers**:
 
-- **Test Frequently**
-  - **Steps**:
-    1. Conduct regular tests after each modification to ensure the firmware behaves as expected.
-    2. Use automated scripts or test benches to validate firmware functionality continuously.
+   - Tools like Teledyne LeCroy’s Telescan PE.
 
-- **Document Changes**
-  - **Steps**:
-    1. Maintain detailed documentation for each change made to the firmware.
-    2. Include explanations for why changes were made and their impact on the overall design.
+2. **Analyze TLP Structures**:
 
-### **15.2 Managing Firmware Versioning**
+   - Understand headers, payloads, and control fields.
 
-- **Use Version Control**
-  - **Steps**:
-    1. Implement a version control system (e.g., **Git**) to manage different iterations of the firmware.
-    2. Commit changes regularly with descriptive messages to track the evolution of the project.
+### **13.2 Crafting Custom TLPs for Specific Operations**
 
-- **Branching Strategy**
-  - **Steps**:
-    1. Use branches to manage feature development, bug fixes, and experimental changes.
-    2. Merge stable branches into the main branch only after thorough testing.
+1. **Memory Read TLP**:
 
-### **15.3 Security Considerations**
+   ```verilog
+   tlp_header <= {fmt, type, tc, td, ep, attr, length};
+   tlp_address <= target_address;
+   ```
 
-- **Prevent Unintended Access**
-  - **Steps**:
-    1. Ensure that the firmware does not expose system memory or hardware to unauthorized access.
-    2. Implement access controls and validation checks within the firmware.
+2. **Memory Write TLP**:
 
-- **Protect Firmware Integrity**
-  - **Steps**:
-    1. Avoid introducing vulnerabilities or backdoors during firmware development.
-    2. Conduct regular security reviews and code audits to maintain firmware integrity.
+   ```verilog
+   tlp_data <= data_payload;
+   ```
 
-- **Handle Sensitive Data Securely**
-  - **Steps**:
-    1. If the firmware interacts with sensitive data, implement encryption and secure data handling practices.
-    2. Ensure that sensitive information is not exposed through firmware interfaces or logs.
+3. **Configuration Access TLP**:
+
+   - For accessing configuration space registers.
 
 ---
 
-## **16. Additional Resources**
+## **14. Advanced Debugging Techniques**
 
-To further enhance your understanding and capabilities in developing custom firmware for device emulation, the following resources are invaluable:
+### **14.1 Using Vivado's Integrated Logic Analyzer**
 
-- **PCILeech-FPGA Repository**
-  - **Link**: [https://github.com/ufrisk/pcileech-fpga](https://github.com/ufrisk/pcileech-fpga)
+1. **Insert ILA Cores**:
 
-- **Vivado FPGA Documentation**
-  - **Link**: [Xilinx Vivado Documentation](https://www.xilinx.com/support/documentation.html)
+   - In Vivado, add ILA cores to monitor internal signals.
 
-- **PCI-SIG Specifications**
-  - **Link**: [PCI-SIG](https://pcisig.com)
+2. **Set Trigger Conditions**:
 
-- **PCIe TLP Primer Tutorial**
-  - **Link**: [PCIe TLP Primer](https://www.xillybus.com/tutorials/pci-express-tlp-pcie-primer-tutorial-guide-1)
+   - Define events that capture data.
 
-- **Teledyne LeCroy Telescan PE Documentation**
-  - **Link**: [Teledyne LeCroy Telescan PE](https://www.teledynelecroy.com/protocolanalyzer/pci-express/telescan-pe-software/resources/analysis-software)
+3. **Analyze Captured Data**:
 
-- **Wireshark PCIe Extensions**
-  - **Link**: [Wireshark Extensions](https://www.wireshark.org/docs/)
+   - Use the waveform viewer to inspect signal behavior.
 
-- **Field Programmable Gate Array (FPGA) Basics**
-  - **Link**: [FPGA Basics](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2020_2/ug901-vivado-tutorial.pdf)
+### **14.2 PCIe Traffic Analysis Tools**
 
-- **Arbor Software User Guide**
-  - **Link**: [Arbor User Guide](https://www.mindshare.com/software/Arbor)
+1. **Teledyne LeCroy Telescan PE**:
 
-- **PCIe Specifications and Guides**
-  - **Link**: [PCIe Specifications](https://pcisig.com/specifications)
+   - Capture and analyze PCIe traffic.
 
----
+2. **Total Phase Beagle**:
 
-## **17. Appendix A: Shadow Configuration Space**
+   - Real-time PCIe protocol analysis.
 
-### **Utilizing Shadow Configuration Space**
+3. **Wireshark with PCIe Extensions**:
 
-The shadow configuration space allows for customization of the firmware without the constraints of Xilinx Vivado's graphical interface. This method involves editing the configuration space directly through a `.coe` file.
-
-#### **Steps to Implement Shadow Configuration Space**
-
-1. **Convert Donor Device's Configuration Space**
-
-   - **Method**:
-     - Use **Telescan PE** to save a copy of your donor device's configuration space to a `.tlscan` file.
-     - Use a conversion script to transform the `.tlscan` file into a `.coe` file suitable for the firmware.
-     - **Script**: [telescan_to_coe.py](https://github.com/Rakeshmonkee/DMA/blob/main/.tlscan%20to%20.coe/telescan_to_coe.py)
-
-   - **Instructions**:
-     - Follow the instructions provided in the script's repository to perform the conversion.
-
-2. **Modify Firmware Files**
-
-   - **File**: `src/pcileech_fifo.sv`
-   - **Change**:
-     ```verilog
-     rw[203] <= 1'b1; // CFGTLP ZERO DATA
-     ```
-     - Change to:
-     ```verilog
-     rw[203] <= 1'b0;
-     ```
-   - **Note**: If you have previously changed `rw[20]` and potentially `rw[21]` in `pcileech_pcie_cfg_a7.sv`, revert those changes back to `0`.
-
-3. **Update `pcileech_cfgspace.coe`**
-
-   - **Steps**:
-     1. Replace the contents of `pcileech_cfgspace.coe` with the converted configuration data from your donor device.
-     2. Adjust BAR configurations:
-        - Convert BAR addresses to sizing in the `.coe` file.
-        - Use Vivado to verify what your BAR should look like with the specific size.
-
-4. **Set Synthesis Options**
-
-   - **In Vivado**:
-     - When generating the Vivado project, select **Global** in your synthesis options.
-     - **Image Reference**:
-
-       ![Synthesis Options](https://github.com/Silverr12/DMA-CFW-Guide/assets/48173453/d997c1e7-ba9b-47e6-b0fb-5a31ee2cf4f8)
-
-5. **Modify `pcie_7x_0_core_top`**
-
-   - **Steps**:
-     1. Navigate to `pcie_7x_0_core_top` in Vivado.
-     2. Change both `EXT_CFG_CAP_PTR` and `EXT_CFG_XP_CAP_PTR` to `8'h01` or another appropriate value.
-     3. **Note**: Setting these variables changes where the shadow configuration space takes over.
-
-   - **Calculation for `EXT_CFG_CAP_PTR`**:
-     - Determine the block where you want the shadow configuration space to start.
-     - Convert the hex value of that block to decimal, divide by 4, then convert back to hex.
-
-6. **Generate Bitstream**
-
-   - **Steps**:
-     1. Proceed to generate the bitstream using Vivado.
-     2. Ensure all changes are saved before starting the synthesis and implementation.
+   - Monitor PCIe packets on supported systems.
 
 ---
 
-## **18. Appendix B: Writemask Implementation**
+## **15. Emulation Accuracy and Optimizations**
 
-### **Implementing Writemask**
+### **15.1 Techniques for Accurate Timing Emulation**
 
-Using the shadow configuration space alone can result in registers being read-only, which may not reflect typical device behavior. Implementing a writemask ensures that registers can be written to as expected.
+1. **Clock Synchronization**:
 
-#### **Steps to Implement Writemask**
+   - Align FPGA clocks with PCIe reference clocks.
 
-1. **Enable PCIe Write**
+2. **Response Timing Control**:
 
-   - **File**: `pcileech_fifo.sv`
-   - **Change**:
-     ```verilog
-     rw[206] <= 1'b0;  // CFGTLP PCIE WRITE ENABLE
-     ```
-     - Change to:
-     ```verilog
-     rw[206] <= 1'b1;
-     ```
+   - Implement delays to match donor device response times.
 
-2. **Generate Writemask File**
+### **15.2 Dynamic Response to System Calls**
 
-   - **Method**:
-     - Use a script to generate a writemask file based on your `.coe` file.
-     - **Script**: [writemask.it](https://github.com/Simonrak/writemask.it)
+1. **State Machines**:
 
-   - **Steps**:
-     1. Follow the instructions in the script's repository to create the writemask file.
-     2. Replace your existing `ip/pcileech_cfgspace_writemask.coe` with the newly generated file.
+   - Manage device states based on system interactions.
 
-3. **Adjust Payload Sizes (if necessary)**
+2. **Adaptive Logic**:
 
-   - **Note**: Issues like "tiny PCIe algorithm" can be resolved by adjusting the `.cfg_force_mps` parameter in `pcie_7x_0_core_top` to match `DEV_CAP_MAX_PAYLOAD_SUPPORTED`.
-
-4. **Generate Bitstream**
-
-   - **Steps**:
-     1. Proceed to generate the bitstream using Vivado.
-     2. Ensure all changes are saved before starting the synthesis and implementation.
+   - Adjust behavior dynamically during runtime.
 
 ---
 
-## **Conclusion**
+## **16. Best Practices for Firmware Development**
 
-By following this comprehensive guide, you should now have the knowledge and tools necessary to develop custom firmware for full device emulation using FPGA-based DMA hardware. Remember to adhere to best practices, test thoroughly, and consult additional resources as needed.
+### **16.1 Continuous Testing and Documentation**
+
+1. **Regular Testing**:
+
+   - After each change, test the firmware.
+
+2. **Detailed Documentation**:
+
+   - Maintain records of modifications and configurations.
+
+### **16.2 Managing Firmware Versioning**
+
+1. **Use Version Control Systems**:
+
+   - Git or other systems to track changes.
+
+2. **Branching Strategies**:
+
+   - Use branches for new features or experiments.
+
+### **16.3 Security Considerations**
+
+1. **Prevent Unauthorized Access**:
+
+   - Implement access controls in the firmware.
+
+2. **Code Audits**:
+
+   - Regularly review code for vulnerabilities.
 
 ---
 
-## **Support and Community**
+## **17. Incorporating Echnod's FPGA DMA Firmware**
 
-If you have any questions, need further assistance, or wish to contribute to the development of custom firmware, feel free to join our community on Discord:
+### **17.1 Overview of Echnod's Contributions**
 
-[[Discord Banner](https://discord.gg/dS2gDUDQmV)
+- **Optimized TLP Handling**
+- **Advanced DMA Techniques**
+- **Enhanced Error Handling**
+- **Multimedia Stream Emulation**
+
+### **17.2 Adapting Echnod's Techniques**
+
+1. **Implement Efficient TLP Parsing**:
+
+   - Use pipelined architectures.
+
+2. **Zero-Copy DMA**:
+
+   - Reduce latency and CPU overhead.
+
+3. **Robust Error Detection**:
+
+   - Implement comprehensive error handling.
+
+### **17.3 Enhancements for Wi-Fi and Multimedia Emulation**
+
+1. **Wi-Fi Emulation**:
+
+   - Simulate wireless protocols and signal processing.
+
+2. **Multimedia Stream Emulation**:
+
+   - Handle high-bandwidth data streams with synchronization.
+
+---
+
+## **18. Implementing Additional Features**
+
+### **18.1 Power Management Emulation**
+
+1. **Advanced Power States**:
+
+   - Implement ASPM and LPM.
+
+2. **Dynamic Power Adjustment**:
+
+   - Emulate power consumption based on activity.
+
+### **18.2 PCIe Gen3 and Beyond**
+
+1. **Higher Bandwidth Support**:
+
+   - Enable PCIe Gen3 or higher in the IP core.
+
+2. **Enhanced Equalization**:
+
+   - Implement link training procedures.
+
+### **18.3 Virtual Functions and SR-IOV**
+
+1. **Enable SR-IOV Capabilities**:
+
+   - Modify configuration space for SR-IOV.
+
+2. **Implement Virtual Function Logic**:
+
+   - Handle multiple virtual devices.
+
+---
+
+## **19. Appendices**
+
+### **19.1 Appendix A: Shadow Configuration Space**
+
+- **Utilize Shadow Configuration Space**:
+
+  - Allows customization beyond the constraints of the IP core.
+
+- **Implementation Steps**:
+
+  - Convert donor configuration to `.coe` file.
+  - Modify `pcileech_cfgspace.coe`.
+
+### **19.2 Appendix B: Writemask Implementation**
+
+- **Enable Write Capabilities**:
+
+  - Implement writemask to allow writes to configuration registers.
+
+- **Implementation Steps**:
+
+  - Modify `pcileech_fifo.sv`.
+  - Generate writemask file using provided scripts.
+
+---
+
+## **20. Conclusion**
+
+By following this guide, you have learned how to develop custom firmware for full device emulation using FPGA-based DMA hardware. You are now equipped with the foundational knowledge and advanced techniques necessary to create sophisticated emulation solutions.
+
+---
+
+## **21. Additional Resources**
+
+- **PCILeech-FPGA Repository**: [GitHub](https://github.com/ufrisk/pcileech-fpga)
+- **Xilinx Vivado Documentation**: [Xilinx Documentation](https://www.xilinx.com/support/documentation.html)
+- **PCI-SIG Specifications**: [PCI-SIG](https://pcisig.com/specifications)
+- **Echnod's FPGA DMA Firmware**: *[Provide link if available]*
+
+---
+
+## **22. Support and Community**
+
+Join our vibrant community on Discord to connect with fellow developers, seek assistance, and collaborate on enhancing custom firmware projects:
+
+[![Discord Banner](https://discord.gg/dS2gDUDQmV)](https://discord.gg/dS2gDUDQmV)
+
+---
+
+# **Final Thoughts**
+
+This guide has been divided into two comprehensive parts to cater to both beginners and advanced developers. By starting with the basics and progressively moving to advanced topics, you can build a strong foundation and then delve into complex aspects of firmware development.
+
+Remember, firmware development is an iterative process. Regular testing, continuous learning, and community engagement are key to success.
+
+---
+
+# **Next Steps**
+
+- **Practice**: Apply the concepts learned by working on a real FPGA device.
+- **Experiment**: Try implementing advanced features from Part 2.
+- **Contribute**: Share your experiences and improvements with the community.
+
+---
+
+# **Additional Enhancements**
+
+To further improve your understanding:
+
+- **Explore Case Studies**: Review real-world applications of FPGA-based device emulation.
+- **Attend Workshops/Webinars**: Participate in events related to FPGA development.
+- **Read Technical Papers**: Stay updated with the latest research and advancements.
+
+By continuously enhancing your skills and knowledge, you'll be well-equipped to tackle complex firmware development challenges.
+
+---
+
+# **Acknowledgments**
+
+We extend our gratitude to all contributors and community members who have shared their knowledge and experience, making this guide possible.
+
+---
+
+# **Happy Coding!**
+
+We hope this guide serves as a valuable resource in your firmware development journey. Should you have any questions or need further assistance, don't hesitate to reach out through our community channels.
+
+---
+
+*This guide is provided for educational purposes. Ensure compliance with all relevant laws and regulations when applying the techniques described.*
+
+---
+
+# **End of Guide**
+
+Thank you for your commitment to learning and excellence in firmware development.
