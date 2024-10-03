@@ -427,3 +427,379 @@ For performance or data transfer issues:
 - **Optimize FIFO Sizes**: Adjust FIFO buffers for better data handling.
 - **TLP Payload Sizes**: Set the maximum TLP payload size to match the donor device’s specifications.
 - **PCIe Link Settings**: Ensure the PCIe link speed and width match the host system's PCIe capabilities.
+
+---
+
+# **Part 2: Advanced Tutorials**
+
+---
+
+## **Introduction to Advanced Concepts**
+
+In **Part 2**, we’ll dive into advanced techniques for customizing and optimizing your custom firmware for full device emulation. This section will cover more intricate topics such as modifying PCIe parameters for specific emulation tasks, advanced debugging, and techniques for improving emulation accuracy. You’ll also learn how to incorporate additional capabilities like power management, virtual functions, and advanced PCIe features.
+
+By the end of Part 2, you’ll be well-equipped to tackle more sophisticated firmware development challenges and optimize your FPGA design for specific use cases.
+
+---
+
+## **Table of Contents**
+
+11. [Advanced Firmware Customization](#11-advanced-firmware-customization)
+    - [11.1 Configuring PCIe Parameters for Emulation](#111-configuring-pcie-parameters-for-emulation)
+    - [11.2 Adjusting BARs and Memory Mapping](#112-adjusting-bars-and-memory-mapping)
+    - [11.3 Emulating Device Power Management and Interrupts](#113-emulating-device-power-management-and-interrupts)
+12. [Emulating Device-Specific Capabilities](#12-emulating-device-specific-capabilities)
+    - [12.1 Implementing Advanced PCIe Capabilities](#121-implementing-advanced-pcie-capabilities)
+    - [12.2 Emulating Vendor-Specific Features](#122-emulating-vendor-specific-features)
+13. [Transaction Layer Packet (TLP) Emulation](#13-transaction-layer-packet-tlp-emulation)
+    - [13.1 Understanding and Capturing TLPs](#131-understanding-and-capturing-tlps)
+    - [13.2 Crafting Custom TLPs for Specific Operations](#132-crafting-custom-tlps-for-specific-operations)
+14. [Advanced Debugging Techniques](#14-advanced-debugging-techniques)
+    - [14.1 Using Vivado's Integrated Logic Analyzer](#141-using-vivados-integrated-logic-analyzer)
+    - [14.2 PCIe Traffic Analysis Tools](#142-pcie-traffic-analysis-tools)
+15. [Emulation Accuracy and Optimizations](#15-emulation-accuracy-and-optimizations)
+    - [15.1 Techniques for Accurate Timing Emulation](#151-techniques-for-accurate-timing-emulation)
+    - [15.2 Dynamic Response to System Calls](#152-dynamic-response-to-system-calls)
+16. [Best Practices for Firmware Development](#16-best-practices-for-firmware-development)
+    - [16.1 Continuous Testing and Documentation](#161-continuous-testing-and-documentation)
+    - [16.2 Managing Firmware Versioning](#162-managing-firmware-versioning)
+    - [16.3 Security Considerations](#163-security-considerations)
+17. [Incorporating Echnod's FPGA DMA Firmware](#17-incorporating-echnods-fpga-dma-firmware)
+    - [17.1 Overview of Echnod's Contributions](#171-overview-of-echnods-contributions)
+    - [17.2 Adapting Echnod's Techniques](#172-adapting-echnods-techniques)
+    - [17.3 Enhancements for Wi-Fi and Multimedia Emulation](#173-enhancements-for-wi-fi-and-multimedia-emulation)
+18. [Implementing Additional Features](#18-implementing-additional-features)
+    - [18.1 Power Management Emulation](#181-power-management-emulation)
+    - [18.2 PCIe Gen3 and Beyond](#182-pcie-gen3-and-beyond)
+    - [18.3 Virtual Functions and SR-IOV](#183-virtual-functions-and-sr-iov)
+19. [Appendices](#19-appendices)
+    - [19.1 Appendix A: Shadow Configuration Space](#191-appendix-a-shadow-configuration-space)
+    - [19.2 Appendix B: Writemask Implementation](#192-appendix-b-writemask-implementation)
+20. [Conclusion](#20-conclusion)
+21. [Additional Resources](#21-additional-resources)
+22. [Support and Community](#22-support-and-community)
+
+---
+
+# **11. Advanced Firmware Customization**
+
+## **11.1 Configuring PCIe Parameters for Emulation**
+
+The accuracy of emulation greatly depends on how well the FPGA-based device replicates the donor device’s PCIe configuration, link speed, and width. Fine-tuning these settings will allow the host system to interact with the FPGA as if it were the original hardware.
+
+### **Setting PCIe Link Speed and Width**
+
+1. **Open `pcileech_pcie_cfg_a7.sv`** in your editor.
+
+2. **Locate the PCIe Link Speed and Width Configurations**:
+   - Ensure the values for link speed and width are consistent with the donor device.
+
+    ```verilog
+    pcie_link_speed <= 4'b0010;   // PCIe Gen2 (5 GT/s)
+    pcie_link_width <= 8'b00000100; // x4 lanes
+    ```
+
+   **Example**: For a Gen2 x4 PCIe device, set the link speed to `4'b0010` and the width to `8'b00000100`.
+
+### **Configuring Capability Pointers**
+
+PCIe capability pointers are essential for ensuring the host system can access advanced PCIe features like MSI/MSI-X, power management, and error reporting.
+
+1. **Set Capability Pointer**:
+    - Adjust the capability pointer to match that of the donor device.
+
+    ```verilog
+    capability_pointer <= 8'h40;  // Starting location for PCIe capabilities
+    ```
+
+2. **Extended Capabilities**:
+    - You can extend this section by adding or modifying support for features like Advanced Error Reporting (AER) or Latency Tolerance Reporting (LTR).
+
+    ```verilog
+    AER_CAP_VERSION <= 4'b0001;  // Enable AER support
+    ```
+
+---
+
+## **11.2 Adjusting BARs and Memory Mapping**
+
+Base Address Registers (BARs) allow PCIe devices to map their internal memory to system memory. Proper configuration of BARs is critical for the host system to communicate with the emulated device.
+
+### **Setting BAR Sizes**
+
+1. **Open `pcileech_pcie_cfg_a7.sv`**.
+
+2. **Modify the BAR Size Values** to match the donor device’s BARs.
+
+   **Example**: For a 16KB BAR0:
+   ```verilog
+   bar0_size <= 32'h00004000;  // 16KB BAR0
+   ```
+
+3. **Repeat for Additional BARs** as needed for BAR1, BAR2, etc.
+
+### **Defining BAR Address Spaces**
+
+1. Ensure BAR address spaces are **contiguous** and don’t overlap. Overlapping BARs can cause memory mapping errors in the host system.
+
+   ```verilog
+   bar0_addr <= 32'hF0000000;  // Example BAR0 address
+   bar1_addr <= 32'hF0004000;  // Example BAR1 address
+   ```
+
+2. **Align Memory Regions**: Make sure BARs are aligned according to the donor device’s configuration.
+
+---
+
+## **11.3 Emulating Device Power Management and Interrupts**
+
+Properly emulating power management and interrupts is crucial for seamless system integration. The host system expects certain behaviors from the device when it transitions between power states or handles interrupts.
+
+### **Power Management (PM) Configuration**
+
+1. **Set Power Management Capabilities**:
+   - Adjust the power management settings to emulate the donor device's power features.
+
+   ```verilog
+   PM_CAP_VERSION <= 4'b0011;     // Power Management version 3.0
+   PM_CAP_D1SUPPORT <= 1'b1;      // Support for D1 power state
+   PM_CAP_D2SUPPORT <= 1'b0;      // No support for D2
+   ```
+
+2. **Power State Transitions**:
+   - Implement logic for transitioning between power states (D0, D1, D3) as per the donor device’s capabilities.
+
+### **MSI/MSI-X (Interrupts) Configuration**
+
+1. **Enable MSI or MSI-X** in `pcileech_pcie_cfg_a7.sv`.
+
+   ```verilog
+   MSI_CAP_64_BIT_ADDR_CAPABLE <= 1'b1;  // Enable 64-bit address for MSI
+   cfg_interrupt <= 1'b1;                // Enable MSI interrupts
+   ```
+
+2. **Route Interrupt Signals** correctly to ensure that the host system receives the expected interrupt behavior from the emulated device.
+
+   ```verilog
+   assign cfg_interrupt_di = cfg_int_di;
+   assign cfg_interrupt_assert = cfg_int_assert;
+   ```
+
+---
+
+# **12. Emulating Device-Specific Capabilities**
+
+Many devices include advanced capabilities beyond standard PCIe behavior, such as custom power management or proprietary features. Emulating these device-specific capabilities enhances the fidelity of the emulation.
+
+## **12.1 Implementing Advanced PCIe Capabilities**
+
+### **Advanced Error Reporting (AER)**
+
+1. **Enable AER** to match the donor device’s configuration:
+   - Advanced Error Reporting (AER) allows the device to report and log PCIe errors.
+
+    ```verilog
+    AER_CAP_VERSION <= 4'b0001;  // AER capability version 1
+    AER_CAP_NEXTPTR <= 8'h00;    // No next capability
+    ```
+
+### **Link Speed Negotiation**
+
+Ensure that the emulated device supports dynamic link speed negotiation as seen in the donor device.
+
+1. **Set the PCIe Link Speed**:
+   - The FPGA should
+
+ negotiate the link speed based on host system capabilities.
+
+    ```verilog
+    pcie_link_speed <= 4'b0010;  // Gen2 speed (5 GT/s)
+    ```
+
+---
+
+## **12.2 Emulating Vendor-Specific Features**
+
+Certain devices have proprietary features unique to the vendor. These must be carefully implemented to ensure that the FPGA behaves identically to the original device.
+
+### **Capture Vendor-Specific TLPs**
+
+Use PCIe traffic analysis tools (covered in [Section 14.2](#142-pcie-traffic-analysis-tools)) to monitor TLPs and identify vendor-specific behaviors.
+
+### **Implement Vendor-Specific Registers**
+
+Create custom logic to handle any vendor-specific registers or commands.
+
+```verilog
+reg [31:0] vendor_specific_reg;
+
+always @(posedge clk) begin
+    if (vendor_specific_write_enable) begin
+        vendor_specific_reg <= vendor_specific_data_in;
+    end
+end
+```
+
+---
+
+# **13. Transaction Layer Packet (TLP) Emulation**
+
+TLPs are the building blocks of PCIe communication. Accurately crafting TLPs ensures smooth interactions between the host system and the emulated device.
+
+## **13.1 Understanding and Capturing TLPs**
+
+### **TLP Components**
+
+A TLP consists of three key components:
+- **Header**: Contains control information such as address, length, and type of transaction.
+- **Data Payload**: The actual data being transferred.
+- **Tail**: Includes additional control information and checksums.
+
+### **Capturing TLPs**
+
+1. **Use PCIe traffic analysis tools** (e.g., **Wireshark** with PCIe extensions or **Teledyne LeCroy Telescan PE**) to monitor TLP traffic from the donor device.
+
+2. **Analyze TLP Patterns**:
+   - Look for recurring TLP patterns, such as memory reads/writes or configuration accesses.
+
+---
+
+## **13.2 Crafting Custom TLPs for Specific Operations**
+
+Once you understand the structure of TLPs, you can craft custom TLPs to match specific operations from the donor device.
+
+### **Memory Write TLP Example**
+
+```verilog
+// TLP for Memory Write
+tlp_header <= {2'b10, 5'b00000, 3'b000, 1'b0, 1'b0, 2'b00, 10'b0000000001};  // Fmt, Type, etc.
+tlp_address <= 64'h0000000012345678;  // Target address
+tlp_data <= 32'hDEADBEEF;             // Data payload
+```
+
+### **Configuration Access TLP Example**
+
+```verilog
+// TLP for Configuration Write
+tlp_header <= {2'b10, 5'b00101, 3'b000, 1'b0, 1'b0, 2'b00, 10'b0000000001};  // Fmt, Type, etc.
+tlp_address <= 32'h00000010;            // Configuration register address
+tlp_data <= 32'h00000001;               // Data to write
+```
+
+---
+
+# **14. Advanced Debugging Techniques**
+
+## **14.1 Using Vivado's Integrated Logic Analyzer**
+
+The **Integrated Logic Analyzer (ILA)** in Vivado allows you to capture and analyze real-time signals inside the FPGA. This tool is indispensable for debugging custom firmware.
+
+### **Setting Up ILA Probes**
+
+1. **Open Vivado** and navigate to **Tools > Insert Logic Analyzer**.
+
+2. **Select Signals**: Choose the signals you want to monitor (e.g., TLP data or PCIe interrupts).
+
+3. **Configure Triggers**: Set up triggers to capture specific events, such as TLP generation or MSI interrupts.
+
+---
+
+## **14.2 PCIe Traffic Analysis Tools**
+
+In addition to Vivado’s ILA, external tools allow for comprehensive PCIe traffic analysis.
+
+### **Wireshark with PCIe Extensions**
+
+1. **Install Wireshark** with PCIe support.
+   
+2. **Capture Traffic**: Use Wireshark to capture PCIe traffic and filter for relevant TLPs.
+
+### **Teledyne LeCroy Telescan PE**
+
+1. **Install Telescan PE** for advanced PCIe protocol analysis.
+   
+2. **Monitor PCIe Traffic**: Capture and analyze traffic between the FPGA and host system.
+
+---
+
+# **15. Emulation Accuracy and Optimizations**
+
+To ensure seamless integration and undetectable device emulation, follow these advanced optimization techniques.
+
+## **15.1 Techniques for Accurate Timing Emulation**
+
+### **Synchronize Clock Domains**
+
+Ensure that all clocks within the FPGA are synchronized with the PCIe link clock to avoid timing issues during communication.
+
+```verilog
+clk_div <= clk / 2;  // Example of clock division for synchronization
+```
+
+---
+
+## **15.2 Dynamic Response to System Calls**
+
+1. **Implement State Machines**: Use state machines to manage different operational states of the emulated device.
+   
+2. **Handle System Requests Dynamically**: Monitor incoming TLPs and adjust the device’s response accordingly.
+
+---
+
+# **16. Best Practices for Firmware Development**
+
+## **16.1 Continuous Testing and Documentation**
+
+- **Test Frequently**: Regularly test the firmware after each modification.
+- **Document Changes**: Maintain detailed documentation to track changes.
+
+## **16.2 Managing Firmware Versioning**
+
+- **Use Git for Version Control**: Ensure every significant change is tracked.
+- **Branching Strategy**: Use feature branches to manage complex changes.
+
+---
+
+# **17. Incorporating Echnod's FPGA DMA Firmware**
+
+## **17.1 Overview of Echnod's Contributions**
+
+Echnod’s firmware advancements focus on enhancing FPGA-based DMA performance, particularly for Wi-Fi and multimedia applications.
+
+---
+
+# **18. Implementing Additional Features**
+
+## **18.1 Power Management Emulation**
+
+Ensure your firmware properly emulates transitions between power states to match modern energy-efficient devices.
+
+---
+
+# **19. Appendices**
+
+### **19.1 Appendix A: Shadow Configuration Space**
+
+Shadow configuration space allows you to dynamically modify PCIe configuration registers during runtime. Use this technique to emulate complex devices.
+
+---
+
+# **20. Conclusion**
+
+By completing **Part 2: Advanced Tutorials**, you have gained a deeper understanding of advanced firmware customization techniques. You are now prepared to handle complex emulation tasks, optimize your design for specific hardware, and troubleshoot advanced issues.
+
+---
+
+# **21. Additional Resources**
+
+- **PCILeech-FPGA Repository**: [GitHub](https://github.com/ufrisk/pcileech-fpga)
+- **Xilinx Vivado Documentation**: [Xilinx](https://www.xilinx.com/support/documentation.html)
+
+---
+
+# **22. Support and Community**
+
+If you need further assistance or want to collaborate, join our Discord community:
+
+**[Discord - VCPU](https://discord.gg/dS2gDUDQmV)**
+
