@@ -464,9 +464,9 @@ By the end of Part 2, you’ll be well-equipped to tackle more sophisticated fir
     - [16.1 Continuous Testing and Documentation](#161-continuous-testing-and-documentation)
     - [16.2 Managing Firmware Versioning](#162-managing-firmware-versioning)
     - [16.3 Security Considerations](#163-security-considerations)
-17. [Incorporating Echnod's FPGA DMA Firmware](#17-incorporating-echnods-fpga-dma-firmware)
-    - [17.1 Overview of Echnod's Contributions](#171-overview-of-echnods-contributions)
-    - [17.2 Adapting Echnod's Techniques](#172-adapting-echnods-techniques)
+17. [Incorporating ekknod's FPGA DMA Firmware](#17-incorporating-ekknods-fpga-dma-firmware)
+    - [17.1 Overview of ekknod's Contributions](#171-overview-of-ekknods-contributions)
+    - [17.2 Adapting ekknod's Techniques](#172-adapting-ekknods-techniques)
     - [17.3 Enhancements for Wi-Fi and Multimedia Emulation](#173-enhancements-for-wi-fi-and-multimedia-emulation)
 18. [Implementing Additional Features](#18-implementing-additional-features)
     - [18.1 Power Management Emulation](#181-power-management-emulation)
@@ -760,11 +760,11 @@ clk_div <= clk / 2;  // Example of clock division for synchronization
 
 ---
 
-# **17. Incorporating Echnod's FPGA DMA Firmware**
+# **17. Incorporating ekknod's FPGA DMA Firmware**
 
-## **17.1 Overview of Echnod's Contributions**
+## **17.1 Overview of ekknod's Contributions**
 
-Echnod’s firmware advancements focus on enhancing FPGA-based DMA performance, particularly for Wi-Fi and multimedia applications.
+ekknod’s firmware advancements focus on enhancing FPGA-based DMA performance, particularly for Wi-Fi and multimedia applications.
 
 ---
 
