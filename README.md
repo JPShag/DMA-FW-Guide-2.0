@@ -14,7 +14,11 @@ If you need assistance, have inquiries, or are looking to collaborate, feel free
 
 ### **Discord** - **VCPU**
 
+Don't have the time or energy to make firmware yourself? I offer firmware starting at $60. Resellers are also welcome!
+
 Reach out anytime for support or further discussion on this guide or related topics. Whether you’re a developer needing in-depth help or a researcher diving into FPGA emulation, I’m here to ensure your path to success is smooth and informed. Let's build something remarkable together.
+
+Share knowledge and spread loving kindness. God bless.
 
 ---
 
