@@ -1,26 +1,5 @@
 # **Custom Firmware Development Guide for Full Device Emulation**
 
-## **Preface**
-
-**Attention, you thieving scum.** I’m not here to coddle or indulge your pitiful schemes. **FUCK AQUA**, better known as Aqua Teen Paster Force—a disgrace to anyone with a shred of integrity. **FUCK DIVINER**, too. And DUCK? Go degrade yourself elsewhere. **DMA KINGDOM**? You and your parasitic empire can rot in hell with the rest of these frauds. SHITLETTE and all of you money-grubbing thieves, prepare for a reckoning. The **Wrath of God**? You’re about to understand the meaning of true devastation. Either atone for your greed, or get swept away by the destruction you deserve.
-
-For those who’ve come to **learn**, you’ve chosen the path of **true enlightenment**. What you build with this guide will outshine anything these charlatans could dream of. You’re on the road to **excellence**, and together, we’ll torch the failures they’ve built their fortunes on. 
-
----
-
-## **Contact Information**
-
-If you need assistance, have inquiries, or are looking to collaborate, feel free to reach out. I’m available to provide guidance, troubleshoot complex problems, or discuss ideas in detail.
-
-### **Discord** - **VCPU**
-
-Don't have the time or energy to make firmware yourself? I offer firmware starting at $60. Resellers are also welcome!
-
-Reach out anytime for support or further discussion on this guide or related topics. Whether you’re a developer needing in-depth help or a researcher diving into FPGA emulation, I’m here to ensure your path to success is smooth and informed. Let's build something remarkable together.
-
-Share knowledge and spread loving kindness. God bless.
-
----
 
 ## **Table of Contents**
 
@@ -74,6 +53,28 @@ Share knowledge and spread loving kindness. God bless.
     - [15.2 Managing Firmware Versioning](#152-managing-firmware-versioning)
     - [15.3 Security Considerations](#153-security-considerations)
 16. [Additional Resources](#16-additional-resources)
+
+---
+
+## **Preface**
+
+**Attention, you thieving scum.** I’m not here to coddle or indulge your pitiful schemes. **FUCK AQUA**, better known as Aqua Teen Paster Force—a disgrace to anyone with a shred of integrity. **FUCK DIVINER**, too. And DUCK? Go degrade yourself elsewhere. **DMA KINGDOM**? You and your parasitic empire can rot in hell with the rest of these frauds. SHITLETTE and all of you money-grubbing thieves, prepare for a reckoning. The **Wrath of God**? You’re about to understand the meaning of true devastation. Either atone for your greed, or get swept away by the destruction you deserve.
+
+For those who’ve come to **learn**, you’ve chosen the path of **true enlightenment**. What you build with this guide will outshine anything these charlatans could dream of. You’re on the road to **excellence**, and together, we’ll torch the failures they’ve built their fortunes on. 
+
+---
+
+## **Contact Information**
+
+If you need assistance, have inquiries, or are looking to collaborate, feel free to reach out. I’m available to provide guidance, troubleshoot complex problems, or discuss ideas in detail.
+
+### **Discord** - **VCPU**
+
+Don't have the time or energy to make firmware yourself? I offer firmware starting at $60. Resellers are also welcome!
+
+Reach out anytime for support or further discussion on this guide or related topics. Whether you’re a developer needing in-depth help or a researcher diving into FPGA emulation, I’m here to ensure your path to success is smooth and informed. Let's build something remarkable together.
+
+Share knowledge and spread loving kindness. God bless.
 
 ---
 
