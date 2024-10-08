@@ -58,7 +58,7 @@
 
 ## **Preface**
 
-**Attention, you thieving scum.** I’m not here to coddle or indulge your pitiful schemes. **FUCK AQUA**, better known as Aqua Teen Paster Force—a disgrace to anyone with a shred of integrity. **FUCK DIVINER**, too. And DUCK? Go degrade yourself elsewhere. **DMA KINGDOM**? You and your parasitic empire can rot in hell with the rest of these frauds. SHITLETTE and all of you money-grubbing thieves, prepare for a reckoning. The **Wrath of God**? You’re about to understand the meaning of true devastation. Either atone for your greed, or get swept away by the destruction you deserve.
+**Attention, you thieving scum.** I’m not here to coddle or indulge your pitiful schemes. **FUCK AQUA**, better known as Aqua Teen Paster Force—a disgrace to anyone with a shred of integrity. **FUCK DIVINER**, too. And DUCK? Go degrade yourself elsewhere. **DMA KINGDOM**? You and your parasitic empire can rot in hell with the rest of these frauds. SHITLETTE and all of you money-grubbing thieves, prepare for a reckoning. The **Wrath of God**? You’re about to understand the meaning of true devastation. Either atone for your greed, or get swept away by the destruction you deserve. While we are on this topic, FUCK YOU TOO BILL GATES.
 
 For those who’ve come to **learn**, you’ve chosen the path of **true enlightenment**. What you build with this guide will outshine anything these charlatans could dream of. You’re on the road to **excellence**, and together, we’ll torch the failures they’ve built their fortunes on. 
 
@@ -69,10 +69,15 @@ For those who’ve come to **learn**, you’ve chosen the path of **true enlight
 If you need assistance, have inquiries, or are looking to collaborate, feel free to reach out. I’m available to provide guidance, troubleshoot complex problems, or discuss ideas in detail.
 
 ### **Discord** - **VCPU**
+### **Community** - [**Discord**](https://discord.gg/dS2gDUDQmV)
 
 Don't have the time or energy to make firmware yourself? I offer firmware starting at $60. Resellers are also welcome!
 
 Reach out anytime for support or further discussion on this guide or related topics. Whether you’re a developer needing in-depth help or a researcher diving into FPGA emulation, I’m here to ensure your path to success is smooth and informed. Let's build something remarkable together.
+
+If you are unsure if you completed a step properly or want me to review your implementation I will do so but you must have the section for review marked with //VCPU-REVIEW// and explain your problems so my time is not wasted.
+
+I am sure quite a few of you will exceed my capabilities, If you find something new or just make some sick firmware, I would love to see it in action. Moreover, I also have some very powerful bytes and bits to share, but if I shared here Riot PD would put me in a squad car.
 
 Share knowledge and spread loving kindness. God bless.
 
