@@ -68,8 +68,9 @@ For those who’ve come to **learn**, you’ve chosen the path of **true enlight
 
 If you need assistance, have inquiries, or are looking to collaborate, feel free to reach out. I’m available to provide guidance, troubleshoot complex problems, or discuss ideas in detail.
 
-### **Discord** - **VCPU**
-### **Community** - [**Discord**](https://discord.gg/dS2gDUDQmV)
+### **Discord** - **VCPU** | **Community** - [**Discord**](https://discord.gg/dS2gDUDQmV)
+
+---
 
 Don't have the time or energy to make firmware yourself? I offer firmware starting at $60. Resellers are also welcome!
 
