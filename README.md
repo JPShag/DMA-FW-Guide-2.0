@@ -83,7 +83,7 @@ If you found this guide helpful and want to fuel more projects, consider contrib
 ### **Crypto Donations (LTC)**  
 - MPMyQD5zgy2b2CpDn1C1KZ31KmHpT7AwRi
 
-I don’t make much from selling firmware—maybe 5-10 sales adding up to around $400 total—but I know many people using this guide will go on to make far more. If this guide helped you on your path to success, consider giving back so I can keep these resources available for everyone.
+I don’t make much from selling firmware—maybe 5 sales adding up to around $300 total—but I know many people using this guide will go on to make far more. If this guide helped you on your path to success, consider giving back so I can keep these resources available for everyone.
 
 ### **Special Bonus**  
 If you donate, reach out to me on Discord (VCPU) and let me know. I’d love to thank you personally and offer something in return. I’ll even do a random prize spin—whether it's free firmware, private source codes, or some insights on bypassing ACS, there’ll be something special for you.
