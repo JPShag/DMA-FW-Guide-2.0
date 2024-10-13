@@ -1,0 +1,14 @@
+funding:
+  github: []  # Add up to 4 GitHub Sponsors-enabled usernames
+  patreon: 'vcpu'  # Add your Patreon username if applicable
+  open_collective: ''  # Add your Open Collective username if applicable
+  ko_fi: 'virtualcpu'  # Your Ko-fi username
+  tidelift: ''  # Add your Tidelift platform-name/package-name if applicable
+  community_bridge: ''  # Add your Community Bridge project-name if applicable
+  liberapay: ''  # Add your Liberapay username if applicable
+  issuehunt: ''  # Add your IssueHunt username if applicable
+  lfx_crowdfunding: ''  # Add your LFX Crowdfunding project-name if applicable
+  polar: ''  # Add your Polar username if applicable
+  buy_me_a_coffee: 'vcpu'  # Your Buy Me a Coffee username
+  thanks_dev: ''  # Add your thanks.dev username if applicable
+  custom: []  # Add custom sponsorship URLs if applicable
