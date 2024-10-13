@@ -1,14 +1,15 @@
-funding:
-  github: []  # Add up to 4 GitHub Sponsors-enabled usernames
-  patreon: 'vcpu'  # Add your Patreon username if applicable
-  open_collective: ''  # Add your Open Collective username if applicable
-  ko_fi: 'virtualcpu'  # Your Ko-fi username
-  tidelift: ''  # Add your Tidelift platform-name/package-name if applicable
-  community_bridge: ''  # Add your Community Bridge project-name if applicable
-  liberapay: ''  # Add your Liberapay username if applicable
-  issuehunt: ''  # Add your IssueHunt username if applicable
-  lfx_crowdfunding: ''  # Add your LFX Crowdfunding project-name if applicable
-  polar: ''  # Add your Polar username if applicable
-  buy_me_a_coffee: 'vcpu'  # Your Buy Me a Coffee username
-  thanks_dev: ''  # Add your thanks.dev username if applicable
-  custom: []  # Add custom sponsorship URLs if applicable
+# These are supported funding model platforms
+
+github: # Replace with up to 4 GitHub Sponsors-enabled usernames e.g., [user1, user2]
+patreon: vcpu
+open_collective: # Replace with a single Open Collective username
+ko_fi: virtualcpu
+tidelift: # Replace with a single Tidelift platform-name/package-name e.g., npm/babel
+community_bridge: # Replace with a single Community Bridge project-name e.g., cloud-foundry
+liberapay: # Replace with a single Liberapay username
+issuehunt: # Replace with a single IssueHunt username
+lfx_crowdfunding: # Replace with a single LFX Crowdfunding project-name e.g., cloud-foundry
+polar: # Replace with a single Polar username
+buy_me_a_coffee: vcpu
+thanks_dev: # Replace with a single thanks.dev username
+custom: # Replace with up to 4 custom sponsorship URLs e.g., ['link1', 'link2']
