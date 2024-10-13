@@ -76,10 +76,6 @@ If you need assistance, have inquiries, or are looking to collaborate, feel free
 
 If you found this guide helpful and want to fuel more projects, consider contributing to help keep everything going. Every donation helps me continue to create, share, and support the community, and it’s greatly appreciated.
 
-### **Buy Me a Coffee**  
-- [ko-fi.com/virtualcpu](https://ko-fi.com/virtualcpu)  
-- [buymeacoffee.com/vcpu](https://buymeacoffee.com/vcpu)  
-
 ### **Crypto Donations (LTC)**  
 - MPMyQD5zgy2b2CpDn1C1KZ31KmHpT7AwRi
 
