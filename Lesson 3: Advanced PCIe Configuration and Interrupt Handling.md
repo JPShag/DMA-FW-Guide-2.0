@@ -2,6 +2,8 @@
 
 ## **Overview**
 
+Please let me know if you guys like the lesson based format over the all in one guide. If so, I will provide a course nd perhaps videos.
+
 This lesson delves into the intricacies of PCI Express (PCIe) configuration, specifically focusing on determining maximal payload sizes and handling interrupts within FPGA-based systems using Xilinx Artix-7. Additionally, it explores the PCIe data link layer mechanisms, including Transaction Layer Packets (TLPs), Data Link Layer Packets (DLLPs), and flow control. By the end of this lesson, you will have a comprehensive understanding of configuring PCIe devices, defining interrupts in FPGA designs, and optimizing PCIe performance on Artix-7 platforms.
 
 ---
