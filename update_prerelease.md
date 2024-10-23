@@ -249,259 +249,838 @@ To ensure smooth emulation, several PCIe-specific features must be addressed:
 
 ---
 
+
 ## **5. Gathering Donor Device Information**
 
-Accurate device emulation relies on extracting critical information from the donor device. This data allows your FPGA to mimic the target hardware in terms of PCIe configuration and behavior.
+Accurate device emulation hinges on meticulously extracting and replicating critical information from the donor device. This comprehensive data collection enables your FPGA to faithfully mimic the target hardware's PCIe configuration and behavior, ensuring compatibility and functionality when interfacing with the host system.
 
 ### **5.1 Using Arbor for PCIe Device Scanning**
 
-**Arbor** is a powerful tool for scanning PCIe devices and extracting necessary information.
+**Arbor** is a robust and user-friendly tool designed for in-depth scanning of PCIe devices. It provides detailed insights into the configuration space of connected hardware, making it an invaluable resource for extracting the necessary information for device emulation.
 
 #### **5.1.1 Install Arbor**
 
-- **Steps**:
-  1. Visit the [Arbor Download Page](https://www.mindshare.com/software/Arbor).
-  2. Create an account if required.
-  3. Download and install Arbor.
+To begin utilizing Arbor for device scanning, you must first install the software on your system.
+
+**Steps:**
+
+1. **Visit the Arbor Download Page:**
+
+   - Navigate to the official [Arbor Download Page](https://www.mindshare.com/software/Arbor) using your preferred web browser.
+   - Ensure you are accessing the site directly to avoid any malicious redirects.
+
+2. **Create an Account (if required):**
+
+   - Arbor may require you to create a user account to access the download links.
+   - Provide the necessary information, such as your name, email address, and organization.
+   - Verify your email if prompted, to activate your account.
+
+3. **Download Arbor:**
+
+   - Once logged in, locate the download section for Arbor.
+   - Select the version compatible with your operating system (e.g., Windows 10/11 64-bit).
+   - Click the **Download** button and save the installer to a known location on your computer.
+
+4. **Install Arbor:**
+
+   - Locate the downloaded installer file (e.g., `ArborSetup.exe`).
+   - Right-click the installer and select **Run as administrator** to ensure it has the necessary permissions.
+   - Follow the on-screen instructions to complete the installation process.
+     - Accept the license agreement.
+     - Choose the installation directory.
+     - Opt to create desktop shortcuts if desired.
+
+5. **Verify Installation:**
+
+   - Upon completion, ensure that Arbor is listed in your Start Menu or on your desktop.
+   - Launch Arbor to confirm it opens without errors.
 
 #### **5.1.2 Scan PCIe Devices**
 
-- **Steps**:
-  1. Launch Arbor.
-  2. Navigate to the **Local System** tab.
-  3. Click **Scan/Rescan** to detect all connected PCIe devices.
+With Arbor installed, you can proceed to scan your system for connected PCIe devices.
+
+**Steps:**
+
+1. **Launch Arbor:**
+
+   - Double-click the Arbor icon on your desktop or find it via the Start Menu.
+   - If prompted by User Account Control (UAC), allow the application to make changes to your device.
+
+2. **Navigate to the Local System Tab:**
+
+   - In the Arbor interface, locate the navigation pane or tabs.
+   - Click on **Local System** to access tools for scanning the local machine.
+
+3. **Scan for PCIe Devices:**
+
+   - Look for a **Scan** or **Rescan** button, typically located at the top or bottom of the interface.
+   - Click **Scan/Rescan** to initiate the detection process.
+   - Wait for the scanning process to complete; this may take a few moments depending on the number of devices connected.
+
+4. **Review Detected Devices:**
+
+   - Once the scan is complete, Arbor will display a list of all detected PCIe devices.
+   - The devices are usually listed with their names, device IDs, and other identifying information.
 
 #### **5.1.3 Identify the Donor Device**
 
-- **Steps**:
-  1. Locate your donor device in the list.
-  2. Click on the device to view detailed configuration.
+Identifying the correct donor device is crucial for accurate emulation.
+
+**Steps:**
+
+1. **Locate Your Donor Device in the List:**
+
+   - Scroll through the list of devices detected by Arbor.
+   - Look for the device matching the make and model of your donor hardware.
+   - Devices may be listed by their vendor names, device types, or function.
+
+2. **Verify Device Details:**
+
+   - Click on the device to select it.
+   - Confirm that the **Device ID** and **Vendor ID** match those of your donor device.
+     - **Tip:** These IDs are typically found in the device's documentation or on the manufacturer's website.
+
+3. **View Detailed Configuration:**
+
+   - With the device selected, find and click on an option like **View Details** or **Properties**.
+   - This will open a detailed view showing the device's configuration space and capabilities.
+
+4. **Cross-Reference with Physical Hardware:**
+
+   - If multiple similar devices are listed, cross-reference the **Slot Number** or **Bus Address** with the physical slot where the donor device is installed.
 
 #### **5.1.4 Capture Device Data**
 
-- **Information to Extract**:
-  - **Device ID**
-  - **Vendor ID**
-  - **Subsystem ID**
-  - **Revision ID**
-  - **Class Code**
-  - **Base Address Registers (BARs)**
-  - **Capabilities**
-  - **Device Serial Number (DSN)** (if available)
+Extracting detailed information from the donor device is essential for accurate emulation.
 
-- **Steps**:
-  1. Navigate to the **PCI Config** tab.
-  2. Record all relevant details.
-  3. Save the data for reference.
+**Information to Extract:**
+
+- **Device ID (0xXXXX):**
+  - A 16-bit identifier unique to the device model.
+- **Vendor ID (0xYYYY):**
+  - A 16-bit identifier assigned to the manufacturer.
+- **Subsystem ID (0xZZZZ):**
+  - Identifies the specific subsystem or variant.
+- **Subsystem Vendor ID (0xWWWW):**
+  - Identifies the vendor of the subsystem.
+- **Revision ID (0xRR):**
+  - Indicates the revision level of the device.
+- **Class Code (0xCCCCCC):**
+  - A 24-bit code that defines the type of device (e.g., network controller, storage device).
+- **Base Address Registers (BARs):**
+  - Registers defining the memory or I/O space the device uses.
+  - Includes BAR0 through BAR5, each potentially 32 or 64 bits.
+- **Capabilities:**
+  - Lists supported features such as MSI/MSI-X, power management, PCIe link speed, and width.
+- **Device Serial Number (DSN):**
+  - A 64-bit unique identifier, if the device supports it.
+
+**Steps:**
+
+1. **Navigate to the PCI Config Tab:**
+
+   - Within the device's detailed view, find and select the **PCI Config** or **Configuration Space** tab.
+
+2. **Record Relevant Details:**
+
+   - Carefully document each of the required fields.
+   - Use screenshots or copy the values into a text file or spreadsheet for accuracy.
+   - Ensure hexadecimal values are noted correctly, including the `0x` prefix if used.
+
+3. **Expand Capability Lists:**
+
+   - Look for sections labeled **Capabilities** or **Advanced Features**.
+   - Document each capability and its parameters (e.g., MSI count, power states supported).
+
+4. **Examine BARs in Detail:**
+
+   - For each BAR, note:
+     - **BAR Number (e.g., BAR0):**
+     - **Type (Memory or I/O):**
+     - **Bit Width (32-bit or 64-bit):**
+     - **Size (e.g., 256 MB):**
+     - **Prefetchable Status (Yes/No):**
+
+5. **Save the Data for Reference:**
+
+   - Compile all the information into a well-organized document.
+   - Label each section clearly for easy reference during firmware customization.
+
+6. **Double-Check Entries:**
+
+   - Review all recorded data to ensure accuracy.
+   - Correct any discrepancies by revisiting the Arbor interface.
 
 ### **5.2 Extracting and Recording Device Attributes**
 
-Ensure you have accurately recorded the following:
+After capturing the data, it's crucial to understand the significance of each attribute and ensure they've been accurately documented.
 
-1. **Device ID**: Unique identifier for the hardware device.
-2. **Vendor ID**: Identifier of the device manufacturer.
-3. **Subsystem ID**: Identifies the specific subsystem.
-4. **Revision ID**: Hardware version number.
-5. **Class Code**: Indicates the device type.
-6. **BARs**: Defines memory and I/O address regions.
-7. **Capabilities**: MSI/MSI-X, power management, PCIe link speed/width.
-8. **DSN**: Unique serial number, if available.
+**Ensure You Have Accurately Recorded the Following:**
+
+1. **Device ID:**
+
+   - **Purpose:** Uniquely identifies the device model.
+   - **Usage:** Essential for the host OS to load the correct driver.
+
+2. **Vendor ID:**
+
+   - **Purpose:** Identifies the manufacturer.
+   - **Usage:** Used in conjunction with Device ID to match device drivers.
+
+3. **Subsystem ID and Subsystem Vendor ID:**
+
+   - **Purpose:** Specifies the subsystem's device and vendor IDs, allowing for differentiation between variants.
+   - **Usage:** Important for devices with multiple configurations or OEM-specific versions.
+
+4. **Revision ID:**
+
+   - **Purpose:** Indicates the hardware revision.
+   - **Usage:** Helps in identifying specific hardware versions that may require different drivers or firmware.
+
+5. **Class Code:**
+
+   - **Purpose:** Categorizes the device type (e.g., mass storage, network controller).
+   - **Usage:** Allows the OS to understand the device's general function.
+
+6. **Base Address Registers (BARs):**
+
+   - **Purpose:** Define the memory or I/O address regions that the device will use.
+   - **Usage:** Critical for mapping device memory into the system address space.
+
+7. **Capabilities:**
+
+   - **Purpose:** Lists the advanced features the device supports.
+   - **Examples:**
+     - **MSI/MSI-X:** Message Signaled Interrupts for efficient interrupt handling.
+     - **Power Management:** States like D0, D1, D2, D3hot, D3cold.
+     - **PCIe Link Speed/Width:** Determines the data transfer capabilities.
+
+8. **Device Serial Number (DSN):**
+
+   - **Purpose:** A unique 64-bit identifier for the device.
+   - **Usage:** Used for advanced identification and may be required by some drivers.
+
+**Best Practices:**
+
+- **Organize the Data:**
+
+  - Create a structured document or spreadsheet.
+  - Use clear headings and subheadings for each attribute.
+
+- **Include Units and Formats:**
+
+  - Indicate units for sizes (e.g., MB, KB).
+  - Use consistent formatting for hexadecimal values (e.g., `0x1234`).
+
+- **Cross-Reference with Specifications:**
+
+  - If available, consult the device's datasheet to verify values.
+  - This can help identify any discrepancies or unusual configurations.
+
+- **Secure the Data:**
+
+  - Store the collected information securely.
+  - Be mindful of any proprietary or confidential information.
 
 ---
 
 ## **6. Initial Firmware Customization**
 
-With donor information in hand, customize the PCIe configuration space and memory mapping within the firmware.
+With the donor device's information meticulously documented, the next phase involves customizing your FPGA's firmware to emulate the donor device accurately. This involves modifying the PCIe configuration space and ensuring that memory mappings align correctly.
 
 ### **6.1 Modifying Configuration Space**
 
+The PCIe configuration space is a critical component that defines how the device is recognized and interacts with the host system. Customizing this space to match the donor device is essential for successful emulation.
+
 #### **6.1.1 Navigate to the Configuration File**
 
-- **Path**:
+The configuration space is defined within a specific SystemVerilog (.sv) file in your project.
+
+**Path:**
+
+- **Standard Path:**
   ```
-  pcileech-wifi-main/src/pcileech_pcie_cfg_a7.sv
+  pcileech-fpga/pcileech-wifi-main/src/pcileech_pcie_cfg_a7.sv
   ```
-- **Alternative Path (Based on Directory Structure)**:
+
+- **Alternative Path (Depending on Directory Structure):**
   ```
-  pcileech-wifi-main/src/pcileech_pcie_cfg_a7.sv
+  pcileech-fpga/src/pcileech_pcie_cfg_a7.sv
   ```
+
+**Notes:**
+
+- Ensure you are in the correct project directory.
+- The file name may vary slightly depending on the FPGA model (e.g., `_a7` indicates Artix-7 series).
 
 #### **6.1.2 Open the File in Visual Studio Code**
 
-- **Steps**:
-  1. Launch Visual Studio Code.
-  2. Open the `pcileech_pcie_cfg_a7.sv` file by navigating to:
-     ```
-     pcileech-wifi-main/src/pcileech_pcie_cfg_a7.sv
-     ```
+Editing the configuration file requires a suitable code editor that supports syntax highlighting for SystemVerilog.
+
+**Steps:**
+
+1. **Launch Visual Studio Code:**
+
+   - Click on the VS Code icon or find it via the Start Menu.
+
+2. **Open the File:**
+
+   - Use **File > Open File** or press `Ctrl + O`.
+   - Navigate to the configuration file path mentioned above.
+   - Select `pcileech_pcie_cfg_a7.sv` and click **Open**.
+
+3. **Verify Syntax Highlighting:**
+
+   - Ensure that the editor recognizes the `.sv` file extension.
+   - If necessary, install extensions for SystemVerilog support.
+
+4. **Familiarize Yourself with the File Structure:**
+
+   - Scroll through the file to understand the existing assignments and comments.
+   - Look for sections where configuration registers are defined.
 
 #### **6.1.3 Modify Device ID and Vendor ID**
 
-- **Steps**:
-  1. Search for `cfg_deviceid` and update:
-     ```verilog
-     cfg_deviceid <= 16'hXXXX;  // Replace XXXX with donor Device ID
-     ```
-  2. Search for `cfg_vendorid` and update:
-     ```verilog
-     cfg_vendorid <= 16'hYYYY;  // Replace YYYY with donor Vendor ID
-     ```
+Updating these identifiers is crucial for the host system to recognize the emulated device as the donor.
+
+**Steps:**
+
+1. **Search for `cfg_deviceid`:**
+
+   - Use the search functionality (`Ctrl + F`).
+   - Locate the line defining `cfg_deviceid`.
+
+2. **Update Device ID:**
+
+   ```verilog
+   cfg_deviceid <= 16'hXXXX;  // Replace XXXX with the donor's Device ID
+   ```
+
+   - **Example:**
+     - If the donor's Device ID is `0x1234`, update as:
+       ```verilog
+       cfg_deviceid <= 16'h1234;
+       ```
+
+3. **Search for `cfg_vendorid`:**
+
+   - Locate the line defining `cfg_vendorid`.
+
+4. **Update Vendor ID:**
+
+   ```verilog
+   cfg_vendorid <= 16'hYYYY;  // Replace YYYY with the donor's Vendor ID
+   ```
+
+   - **Example:**
+     - If the donor's Vendor ID is `0xABCD`, update as:
+       ```verilog
+       cfg_vendorid <= 16'hABCD;
+       ```
+
+5. **Ensure Correct Formatting:**
+
+   - Verify that hexadecimal values are prefixed with `16'h`.
+   - Maintain consistent indentation and commenting style.
 
 #### **6.1.4 Modify Subsystem ID and Revision ID**
 
-- **Steps**:
-  1. Search for `cfg_subsysid` and update:
-     ```verilog
-     cfg_subsysid <= 16'hZZZZ;  // Replace ZZZZ with donor Subsystem ID
-     ```
-  2. Search for `cfg_revisionid` and update:
-     ```verilog
-     cfg_revisionid <= 8'hRR;   // Replace RR with donor Revision ID
-     ```
+These identifiers provide additional details about the device variant and hardware revision.
+
+**Steps:**
+
+1. **Search for `cfg_subsysid`:**
+
+   - Locate the line defining `cfg_subsysid`.
+
+2. **Update Subsystem ID:**
+
+   ```verilog
+   cfg_subsysid <= 16'hZZZZ;  // Replace ZZZZ with the donor's Subsystem ID
+   ```
+
+   - **Example:**
+     - If the donor's Subsystem ID is `0x5678`, update as:
+       ```verilog
+       cfg_subsysid <= 16'h5678;
+       ```
+
+3. **Search for `cfg_subsysvendorid`:**
+
+   - Locate the line defining `cfg_subsysvendorid`.
+
+4. **Update Subsystem Vendor ID (if applicable):**
+
+   ```verilog
+   cfg_subsysvendorid <= 16'hWWWW;  // Replace WWWW with the donor's Subsystem Vendor ID
+   ```
+
+   - **Example:**
+     - If the donor's Subsystem Vendor ID is `0x9ABC`, update as:
+       ```verilog
+       cfg_subsysvendorid <= 16'h9ABC;
+       ```
+
+5. **Search for `cfg_revisionid`:**
+
+   - Locate the line defining `cfg_revisionid`.
+
+6. **Update Revision ID:**
+
+   ```verilog
+   cfg_revisionid <= 8'hRR;   // Replace RR with the donor's Revision ID
+   ```
+
+   - **Example:**
+     - If the donor's Revision ID is `0x01`, update as:
+       ```verilog
+       cfg_revisionid <= 8'h01;
+       ```
 
 #### **6.1.5 Update Class Code**
 
-- **Steps**:
-  1. Search for `cfg_classcode` and update:
-     ```verilog
-     cfg_classcode <= 24'hCCCCCC;  // Replace CCCCCC with donor Class Code
-     ```
+The Class Code informs the host of the device type and function.
+
+**Steps:**
+
+1. **Search for `cfg_classcode`:**
+
+   - Locate the line defining `cfg_classcode`.
+
+2. **Update Class Code:**
+
+   ```verilog
+   cfg_classcode <= 24'hCCCCCC;  // Replace CCCCCC with the donor's Class Code
+   ```
+
+   - **Example:**
+     - If the donor's Class Code is `0x020000` (Ethernet Controller), update as:
+       ```verilog
+       cfg_classcode <= 24'h020000;
+       ```
+
+3. **Verify Correct Bit Width:**
+
+   - Ensure that the Class Code is a 24-bit value.
+   - Hexadecimal values should be prefixed with `24'h`.
 
 #### **6.1.6 Save Changes**
 
-- **Steps**:
-  1. Save the file to retain changes.
+After making all modifications, it's important to save and review the changes.
+
+**Steps:**
+
+1. **Save the File:**
+
+   - Click **File > Save** or press `Ctrl + S`.
+
+2. **Review Changes:**
+
+   - Re-read the modified lines to confirm accuracy.
+   - Check for any syntax errors or typos.
+
+3. **Optional - Use Version Control:**
+
+   - If using Git or another version control system, commit your changes with a meaningful message.
+     - **Example:**
+       ```
+       git add pcileech_pcie_cfg_a7.sv
+       git commit -m "Updated PCIe configuration with donor device identifiers"
+       ```
 
 ### **6.2 Inserting the Device Serial Number (DSN)**
 
+The Device Serial Number (DSN) is a unique identifier that some devices utilize for advanced features. Including it enhances the authenticity of the emulation.
+
 #### **6.2.1 Locate the DSN Field**
 
-- **Steps**:
-  1. Search for `cfg_dsn` in `pcileech_pcie_cfg_a7.sv`.
+The DSN is typically defined in the same configuration file.
+
+**Steps:**
+
+1. **Search for `cfg_dsn`:**
+
+   - In `pcileech_pcie_cfg_a7.sv`, use the search function (`Ctrl + F`) to find `cfg_dsn`.
+
+2. **Understand the Existing Assignment:**
+
+   - The DSN may be set to a default value or zeroed out.
+     ```verilog
+     cfg_dsn <= 64'h0000000000000000;  // Default DSN
+     ```
 
 #### **6.2.2 Insert the DSN**
 
-- **Steps**:
-  1. Update `cfg_dsn`:
-     ```verilog
-     cfg_dsn <= 64'hXXXXXXXX_YYYYYYYY;  // Replace with donor DSN
-     ```
-  2. If DSN is not available:
+Updating the DSN involves setting it to the exact value from the donor device.
+
+**Steps:**
+
+1. **Update `cfg_dsn`:**
+
+   ```verilog
+   cfg_dsn <= 64'hXXXXXXXX_YYYYYYYY;  // Replace with donor DSN
+   ```
+
+   - **Example:**
+     - If the donor's DSN is `0x0011223344556677`, update as:
+       ```verilog
+       cfg_dsn <= 64'h0011223344556677;
+       ```
+
+2. **Handle DSN Unavailability:**
+
+   - If the donor device does not have a DSN or it is not required, set it to zero:
      ```verilog
      cfg_dsn <= 64'h0000000000000000;  // No DSN
      ```
 
+3. **Ensure Correct Formatting:**
+
+   - The DSN is a 64-bit value; ensure it's properly formatted.
+   - Use the `64'h` prefix for hexadecimal values.
+
+4. **Add Comments for Clarity:**
+
+   - Include a comment indicating the DSN source.
+     ```verilog
+     cfg_dsn <= 64'h0011223344556677;  // Donor DSN
+     ```
+
 #### **6.2.3 Save Changes**
 
-- **Steps**:
-  1. Save the file.
+Finalize the modifications by saving and reviewing.
+
+**Steps:**
+
+1. **Save the File:**
+
+   - Click **File > Save** or press `Ctrl + S`.
+
+2. **Verify the Syntax:**
+
+   - Look for any red underlines or error indications in the editor.
+   - Correct any issues before proceeding.
+
+3. **Document the Changes:**
+
+   - If using version control, commit the updates with an appropriate message.
+     - **Example:**
+       ```
+       git commit -am "Inserted donor Device Serial Number (DSN) into configuration"
+       ```
 
 ---
 
 ## **7. Vivado Project Setup and Customization**
 
-Integrate the changes into the Vivado project.
+With the firmware files updated to reflect the donor device's configuration, the next step is to integrate these changes into the Vivado project. This involves generating the project files, customizing IP cores, and preparing the design for synthesis and implementation.
 
 ### **7.1 Generating Vivado Project Files**
 
+Vivado uses Tcl scripts to automate project creation and configuration. By running these scripts, you ensure that all settings are correctly applied based on your FPGA device.
+
 #### **7.1.1 Open Vivado**
 
-- **Steps**:
-  1. Launch Vivado.
-  
+Starting with a fresh session of Vivado ensures that previous settings or projects do not interfere with your current work.
+
+**Steps:**
+
+1. **Launch Vivado:**
+
+   - Find the Vivado application in your Start Menu or desktop.
+   - Click to open it.
+
+2. **Select the Correct Version:**
+
+   - If multiple versions are installed, ensure you are using the one compatible with your FPGA (e.g., Vivado 2020.1).
+
+3. **Wait for the Startup Screen:**
+
+   - Allow Vivado to fully initialize before proceeding.
+
 #### **7.1.2 Access the Tcl Console**
 
-- **Steps**:
-  1. Navigate to **Window > Tcl Console**.
+The Tcl Console allows you to execute scripts and commands directly.
+
+**Steps:**
+
+1. **Open the Tcl Console:**
+
+   - In the Vivado interface, go to the menu bar.
+   - Click on **Window** > **Tcl Console**.
+   - The Tcl Console will appear at the bottom of the window.
+
+2. **Adjust Console Size (Optional):**
+
+   - Drag the console's top border to resize it for better visibility.
+
+3. **Clear Previous Commands:**
+
+   - If any commands are present, you can clear them for a clean start.
 
 #### **7.1.3 Navigate to the Project Directory**
 
-- **For Squirrel DMA (35T)**:
-  - **Path**:
-    ```
-    pcileech-wifi-main/
-    ```
-  - **Steps**:
-    1. In the Tcl Console, navigate to the directory:
-       ```tcl
-       cd <path_to_pcileech-wifi-main>
-       ```
+Ensure that the Tcl Console is pointing to the correct directory where your project scripts are located.
+
+**For Squirrel DMA (35T):**
+
+**Path:**
+
+- Your project directory, typically:
+  ```
+  C:/Users/YourUsername/Documents/pcileech-fpga/pcileech-wifi-main/
+  ```
+
+**Steps:**
+
+1. **Set the Working Directory:**
+
+   - In the Tcl Console, enter:
+     ```tcl
+     cd C:/Users/YourUsername/Documents/pcileech-fpga/pcileech-wifi-main/
+     ```
+     - Replace the path with the actual location on your system.
+
+2. **Verify the Directory Change:**
+
+   - Enter `pwd` in the Tcl Console.
+   - The console should display the current directory, confirming the change.
 
 #### **7.1.4 Generate the Vivado Project**
 
-- **Steps**:
-  1. Run the appropriate script based on your FPGA device.
-     - **For Squirrel (35T)**:
-       ```tcl
-       source vivado_generate_project_squirrel.tcl -notrace
-       ```
-     - **For other devices**, use the corresponding `.tcl` script:
-       - **Enigma-X1 (75T)**:
-         ```tcl
-         source vivado_generate_project_enigma_x1.tcl -notrace
-         ```
-       - **ZDMA (100T)**:
-         ```tcl
-         source vivado_generate_project_100t.tcl -notrace
-         ```
-  2. Wait for the script to complete. It will generate the Vivado project files.
+Running the appropriate Tcl script will set up the project with all necessary configurations.
+
+**Steps:**
+
+1. **Run the Tcl Script:**
+
+   - For **Squirrel (35T)**:
+     ```tcl
+     source vivado_generate_project_squirrel.tcl -notrace
+     ```
+   - For **Enigma-X1 (75T)**:
+     ```tcl
+     source vivado_generate_project_enigma_x1.tcl -notrace
+     ```
+   - For **ZDMA (100T)**:
+     ```tcl
+     source vivado_generate_project_100t.tcl -notrace
+     ```
+
+2. **Wait for Script Completion:**
+
+   - The script will execute several commands:
+     - Create the project.
+     - Add source files.
+     - Configure project settings.
+   - Monitor the Tcl Console for progress messages.
+   - Address any errors that may occur, such as missing files or incorrect paths.
+
+3. **Confirm Project Generation:**
+
+   - Upon completion, the console will indicate that the project has been created.
+   - The project files (`.xpr` and associated directories) will be present in the project directory.
 
 #### **7.1.5 Open the Generated Project**
 
-- **Steps**:
-  1. In Vivado, click **File > Open Project**.
-  2. Navigate to the generated project directory:
-     - **For Squirrel**:
-       ```
-       pcileech-wifi-main/pcileech_squirrel_top.xpr
-       ```
-  3. Select the `.xpr` file and open it.
+Now that the project is generated, you can open it within Vivado for further customization.
+
+**Steps:**
+
+1. **Open the Project:**
+
+   - In Vivado, click **File** > **Open Project**.
+   - Navigate to your project directory.
+
+2. **Select the Project File:**
+
+   - For **Squirrel**:
+     ```
+     pcileech_squirrel_top.xpr
+     ```
+   - Click on the `.xpr` file to select it.
+
+3. **Click Open:**
+
+   - Vivado will load the project, displaying the design hierarchy and sources.
+
+4. **Verify Project Contents:**
+
+   - In the **Project Manager** window, ensure that all source files are listed.
+   - Check for any warnings or errors upon opening.
 
 ### **7.2 Modifying IP Blocks**
 
+The PCIe IP core is a critical component that must be configured to match the donor device's specifications. Customizing the IP core ensures that the FPGA behaves identically to the donor hardware at the PCIe protocol level.
+
 #### **7.2.1 Access the PCIe IP Core**
 
-- **Steps**:
-  1. In the **Project Manager** window, expand the **Sources** hierarchy.
-  2. Locate the PCIe IP core instance:
-     - For the Squirrel project, it is typically named `pcie_7x_0.xci`.
-  3. Right-click on `pcie_7x_0.xci` and select **Customize IP**.
+The PCIe IP core is an instantiated IP block within your Vivado project.
+
+**Steps:**
+
+1. **Locate the PCIe IP Core:**
+
+   - In the **Sources** pane, ensure the **Hierarchy** tab is selected.
+   - Expand the design hierarchy to find the PCIe IP core.
+     - It is typically named `pcie_7x_0.xci` or similar.
+
+2. **Open the IP Customization Window:**
+
+   - Right-click on `pcie_7x_0.xci`.
+   - Select **Customize IP** from the context menu.
+   - The **IP Configuration** window will open.
+
+3. **Wait for IP Settings to Load:**
+
+   - The IP customization interface may take a few moments to initialize.
+   - Ensure that all options and tabs are fully loaded before proceeding.
 
 #### **7.2.2 Customize Device IDs and BARs**
 
-- **Steps**:
-  1. In the **PCIe IP Core Configuration** window, navigate to the **Device and Vendor Identifiers** tab.
-  2. Enter the **Device ID**, **Vendor ID**, **Subsystem ID**, and **Revision ID** to match the donor device.
-  3. Set the **Class Code** to match the donor device.
+Configuring the device identifiers within the IP core is crucial for correct enumeration by the host system.
+
+**Steps:**
+
+1. **Navigate to Device and Vendor Identifiers:**
+
+   - In the IP customization window, select the **Device and Vendor Identifiers** tab or section.
+
+2. **Enter the Device ID:**
+
+   - Find the field labeled **Device ID**.
+   - Enter the donor's Device ID (e.g., `0x1234`).
+
+3. **Enter the Vendor ID:**
+
+   - Locate the **Vendor ID** field.
+   - Input the donor's Vendor ID (e.g., `0xABCD`).
+
+4. **Enter the Subsystem ID and Subsystem Vendor ID:**
+
+   - Input the **Subsystem ID** (e.g., `0x5678`).
+   - Input the **Subsystem Vendor ID** (e.g., `0x9ABC`).
+
+5. **Set the Revision ID:**
+
+   - Enter the **Revision ID** (e.g., `0x01`).
+
+6. **Set the Class Code:**
+
+   - Enter the **Class Code** (e.g., `0x020000` for Ethernet Controller).
+
+7. **Configure Other Identifiers (if available):**
+
+   - Some IP cores allow setting **Programming Interface**, **Device Capabilities**, etc.
+   - Match these to the donor device as needed.
 
 #### **7.2.3 Configure BAR Sizes**
 
-- **Steps**:
-  1. Navigate to the **Base Address Registers (BARs)** tab.
-  2. Set the **BAR sizes** and **types** to match the donor device.
-     - Configure each BAR as **32-bit** or **64-bit**, **Memory** or **I/O**, and **Prefetchable** or **Non-Prefetchable** as per the donor device.
-  3. Ensure that the BARs are enabled or disabled to match the donor device.
+The BARs define how the device maps its internal memory and registers to the host system.
+
+**Steps:**
+
+1. **Navigate to Base Address Registers (BARs):**
+
+   - Select the **BARs** tab or section in the IP customization window.
+
+2. **Configure Each BAR:**
+
+   - For **BAR0** to **BAR5**, set the following parameters based on the donor device:
+     - **Enable BAR**: Check or uncheck to match donor device.
+     - **BAR Size**: Select the size from the dropdown (e.g., **256 MB**, **64 KB**).
+     - **BAR Type**:
+       - **Memory (32-bit Addressing)**
+       - **Memory (64-bit Addressing)**
+       - **I/O**
+     - **Prefetchable**: Check if the donor's BAR is prefetchable.
+
+3. **Example Configuration:**
+
+   - **BAR0**:
+     - Enabled
+     - Size: **256 MB**
+     - Type: **Memory (64-bit)**
+     - Prefetchable: **Yes**
+   - **BAR1**:
+     - Disabled (if the donor device does not use BAR1)
+
+4. **Ensure Alignment and Non-Overlapping Spaces:**
+
+   - Verify that the total memory mapped does not exceed the FPGA's capabilities.
+   - Ensure that BAR sizes align with PCIe specification requirements.
+
+5. **Advanced Settings (if applicable):**
+
+   - Some devices may have special requirements, such as expansion ROM BAR.
+   - Configure these settings if necessary.
 
 #### **7.2.4 Finalize IP Customization**
 
-- **Steps**:
-  1. Review all settings to ensure they match the donor device.
-  2. Click **OK** to apply changes.
-  3. Vivado may prompt to regenerate the IP; allow it to do so.
+After configuring all necessary settings, you need to apply the changes.
+
+**Steps:**
+
+1. **Review All Settings:**
+
+   - Go through each tab in the IP customization window.
+   - Confirm that all entries match the donor device's specifications.
+
+2. **Apply Changes:**
+
+   - Click **OK** or **Generate** to apply the settings.
+   - If prompted, confirm that you wish to proceed with the changes.
+
+3. **Regenerate IP Core:**
+
+   - Vivado will regenerate the IP core to reflect the new configurations.
+   - Monitor the **Messages** pane for any errors or warnings.
+
+4. **Update IP in Project:**
+
+   - Ensure that the updated IP core is correctly integrated into your project.
+   - Vivado may prompt to update IP dependencies; allow it to do so.
 
 #### **7.2.5 Lock the IP Core**
 
-- **Purpose**: Prevent Vivado from overwriting manual configurations during synthesis.
-- **Steps**:
-  1. Open the **Tcl Console** within Vivado.
-  2. Execute the following command to lock the IP core:
+Locking the IP core prevents unintended changes during synthesis and implementation.
+
+**Purpose:**
+
+- **Prevent Overwrites:** Ensures that your manual configurations are preserved.
+- **Maintain Consistency:** Keeps the IP core in a known state throughout the build process.
+
+**Steps:**
+
+1. **Open the Tcl Console:**
+
+   - In Vivado, if not already open, go to **Window** > **Tcl Console**.
+
+2. **Execute the Lock Command:**
+
+   - Enter the following command:
      ```tcl
      set_property -name {IP_LOCKED} -value true -objects [get_ips pcie_7x_0]
      ```
-  3. **To Unlock** (if needed in the future):
+   - Press **Enter** to execute.
+
+3. **Verify the Lock:**
+
+   - Check the **Messages** pane for confirmation.
+   - The IP core should now be marked as locked.
+
+4. **Unlocking (if necessary):**
+
+   - To make further changes in the future, you can unlock the IP core:
      ```tcl
      set_property -name {IP_LOCKED} -value false -objects [get_ips pcie_7x_0]
      ```
+   - Remember to re-lock it after making changes.
+
+5. **Document the Action:**
+
+   - Note in your project documentation that the IP core has been locked.
+   - This helps team members understand the project's configuration state.
 
 ---
 
