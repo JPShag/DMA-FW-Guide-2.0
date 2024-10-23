@@ -1608,7 +1608,7 @@ Enhance your understanding and stay updated with the following resources:
 
 If you need assistance, have questions, or wish to collaborate, feel free to reach out. I'm available to provide guidance, troubleshoot complex problems, or discuss ideas in detail.
 
-### **Discord**: **VCPU** | [**Server Invite Link**](https://discord.gg/dS2gDUDQmV)
+### **Discord**: [**VCPU**](https://discord.com/users/196741541094621184) | [**Server Invite Link**](https://discord.gg/dS2gDUDQmV)
 
 ---
 
