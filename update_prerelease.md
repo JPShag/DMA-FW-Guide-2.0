@@ -1090,452 +1090,559 @@ Locking the IP core prevents unintended changes during synthesis and implementat
 
 ## **8. Advanced Firmware Customization**
 
-To achieve precise emulation, further customization of the firmware is necessary. This includes configuring PCIe parameters, adjusting Base Address Registers (BARs), and emulating power management and interrupts.
+To achieve a precise emulation of the donor device, further in-depth customization of the firmware is necessary. This involves aligning the PCIe parameters, adjusting Base Address Registers (BARs), and emulating power management and interrupt mechanisms to match the donor device's specifications. These steps ensure that the emulated device interacts seamlessly with the host system and behaves identically to the original hardware.
 
 ### **8.1 Configuring PCIe Parameters for Emulation**
 
-Accurate emulation requires that the PCIe parameters of your FPGA device match those of the donor device.
+Accurate emulation requires that the PCIe parameters of your FPGA device are meticulously configured to match those of the donor device. This includes settings such as the PCIe link speed, link width, capability pointers, and maximum payload sizes. Proper configuration ensures compatibility with the host system and the correct operation of drivers and applications that interact with the device.
 
 #### **8.1.1 Matching PCIe Link Speed and Width**
 
-The PCIe link speed and width determine the data transfer rate between the device and the host.
+The PCIe link speed and width are critical parameters that determine the data throughput and performance of the device. Matching these settings with the donor device is essential for accurate emulation.
 
-- **Steps**:
+**Steps:**
 
-  1. **Access PCIe IP Core Settings**:
+1. **Access PCIe IP Core Settings:**
 
-     - In Vivado, ensure your project is open.
-     - Locate the PCIe IP core instance `pcie_7x_0` in the **Sources** pane.
+   - **Open Your Vivado Project:**
+     - Launch Vivado and open the project you previously created or modified.
+     - Ensure that all source files are correctly added to the project.
+
+   - **Locate the PCIe IP Core:**
+     - In the **Sources** pane, expand the hierarchy to find the PCIe IP core instance, typically named `pcie_7x_0`.
+     - The file associated with the IP core is usually `pcie_7x_0.xci`.
+
+   - **Customize the IP Core:**
      - Right-click on `pcie_7x_0.xci` and select **Customize IP**.
+     - The IP customization window will open, displaying various configuration options.
 
-  2. **Set Maximum Link Speed**:
+2. **Set Maximum Link Speed:**
 
-     - In the **Link Parameters** tab, set the **Maximum Link Speed** to match the donor device.
-     - **Example**:
-       - If the donor device operates at **Gen2 (5.0 GT/s)**, set **Maximum Link Speed** to **5.0 GT/s**.
+   - **Navigate to Link Parameters:**
+     - In the IP customization window, click on the **Link Parameters** tab or section.
+     - This section contains settings related to the PCIe link's characteristics.
 
-  3. **Set Link Width**:
+   - **Configure Maximum Link Speed:**
+     - Find the **Maximum Link Speed** option.
+     - Set it to match the donor device's link speed.
+       - **Example:**
+         - If the donor device operates at **Gen2 (5.0 GT/s)**, select **5.0 GT/s**.
+         - If it operates at **Gen1 (2.5 GT/s)** or **Gen3 (8.0 GT/s)**, select the corresponding option.
+     - **Note:** Ensure that your FPGA and the physical hardware support the selected link speed.
 
-     - In the same tab, set the **Link Width** to match the donor device.
-     - **Example**:
-       - If the donor device uses a **x4** link, set **Link Width** to **4**.
+3. **Set Link Width:**
 
-  4. **Save and Regenerate**:
+   - **Configure Link Width:**
+     - In the same **Link Parameters** section, locate the **Link Width** setting.
+     - Set it to match the donor device's link width.
+       - **Example:**
+         - If the donor device uses a **x4** link, set the **Link Width** to **4**.
+         - Options typically include **1**, **2**, **4**, **8**, **16** lanes.
+     - **Note:** The physical connectors and the FPGA must support the selected link width.
 
-     - Click **OK** to apply changes.
-     - Allow Vivado to regenerate the IP core if prompted.
+4. **Save and Regenerate:**
+
+   - **Apply Changes:**
+     - After configuring the link speed and width, click **OK** to apply the changes.
+     - Vivado may prompt you to regenerate the IP core due to the changes made.
+     - Confirm and allow the regeneration process to complete.
+
+   - **Verify Settings:**
+     - Once regeneration is complete, revisit the IP core settings to ensure the configurations are correctly applied.
+     - Check for any warnings or errors in the **Messages** window.
 
 #### **8.1.2 Setting Capability Pointers**
 
-Capability pointers are used by the host to locate extended capabilities in the configuration space.
+Capability pointers in the PCIe configuration space point to various capability structures, such as MSI, power management, and others. Correctly setting these pointers ensures that the host system can locate and utilize the device's capabilities.
 
-- **Steps**:
+**Steps:**
 
-  1. **Locate Capability Pointer in Firmware**:
+1. **Locate Capability Pointer in Firmware:**
 
-     - Open the configuration space source file:
+   - **Open Configuration File:**
+     - In Visual Studio Code, open the `pcileech_pcie_cfg_a7.sv` file located at:
        ```
-       pcileech-wifi-main/src/pcileech_pcie_cfg_a7.sv
+       pcileech-fpga/pcileech-wifi-main/src/pcileech_pcie_cfg_a7.sv
        ```
 
-  2. **Set Capability Pointer Value**:
+   - **Understand the Capability Pointer:**
+     - The capability pointer is an 8-bit register that points to the first capability structure in the PCIe configuration space, usually starting after the standard configuration header.
 
-     - In `pcileech_pcie_cfg_a7.sv`, find the assignment for `cfg_cap_pointer`.
-     - Update it to match the donor device:
+2. **Set Capability Pointer Value:**
+
+   - **Find the Assignment for `cfg_cap_pointer`:**
+     - Search for the line in the code where `cfg_cap_pointer` is assigned.
        ```verilog
-       cfg_cap_pointer <= 8'hYY; // Replace YY with donor's capability pointer
+       cfg_cap_pointer <= 8'hXX; // Current value
        ```
 
-  3. **Save Changes**:
+   - **Update the Capability Pointer:**
+     - Replace `XX` with the donor device's capability pointer value.
+       - **Example:**
+         - If the donor device's capability pointer is `0x60`, update the line to:
+           ```verilog
+           cfg_cap_pointer <= 8'h60; // Updated to match donor device
+           ```
 
-     - Save the file after making the changes.
+   - **Ensure Correct Alignment:**
+     - Capability structures must be aligned on a 4-byte boundary.
+     - The capability pointer should point to a valid offset within the configuration space.
+
+3. **Save Changes:**
+
+   - **Save the Configuration File:**
+     - After making the changes, save the file by clicking **File > Save** or pressing `Ctrl + S`.
+
+   - **Verify Syntax:**
+     - Ensure there are no syntax errors introduced by the changes.
+
+   - **Comment for Clarity:**
+     - Add a comment explaining the change for future reference.
+       ```verilog
+       cfg_cap_pointer <= 8'h60; // Set to donor's capability pointer at offset 0x60
+       ```
 
 #### **8.1.3 Adjusting Maximum Payload and Read Request Sizes**
 
-These parameters affect the maximum data that can be sent in a single transaction.
+These parameters define the maximum amount of data that can be transferred in a single PCIe transaction. Matching these settings with the donor device ensures compatibility and optimal performance.
 
-- **Steps**:
+**Steps:**
 
-  1. **Set Maximum Payload Size**:
+1. **Set Maximum Payload Size:**
 
-     - In the PCIe IP Core configuration, navigate to the **Device Capabilities** section.
-     - Set the **Max Payload Size Supported** to match the donor device (e.g., **256 bytes**).
+   - **Access Device Capabilities:**
+     - In the PCIe IP core customization window, navigate to the **Device Capabilities** or **Capabilities** tab.
 
-  2. **Set Maximum Read Request Size**:
+   - **Configure Max Payload Size Supported:**
+     - Find the **Max Payload Size Supported** setting.
+     - Set it to the value supported by the donor device.
+       - **Options:**
+         - **128 bytes**, **256 bytes**, **512 bytes**, **1024 bytes**, **2048 bytes**, **4096 bytes**.
+       - **Example:**
+         - If the donor device supports a maximum payload size of **256 bytes**, select **256 bytes**.
 
-     - Similarly, set the **Max Read Request Size Supported**.
+2. **Set Maximum Read Request Size:**
 
-  3. **Adjust Firmware Parameters**:
+   - **Configure Max Read Request Size Supported:**
+     - In the same tab, find the **Max Read Request Size Supported** setting.
+     - Set it to match the donor device's capability.
+       - **Example:**
+         - If the donor supports a maximum read request size of **512 bytes**, select **512 bytes**.
 
-     - In `pcileech_pcie_cfg_a7.sv`, ensure that these values are reflected in the firmware:
+3. **Adjust Firmware Parameters:**
+
+   - **Open `pcileech_pcie_cfg_a7.sv`:**
+     - Ensure that the configuration file is open in Visual Studio Code.
+
+   - **Update Firmware Constants:**
+     - Locate the lines where `max_payload_size_supported` and `max_read_request_size_supported` are defined.
        ```verilog
-       max_payload_size_supported <= 3'bZZZ; // Replace ZZZ with appropriate value
-       max_read_request_size_supported <= 3'bWWW; // Replace WWW with appropriate value
+       max_payload_size_supported <= 3'bZZZ; // Current value
+       max_read_request_size_supported <= 3'bWWW; // Current value
        ```
 
-  4. **Save Changes**:
+   - **Set the Appropriate Values:**
+     - Replace `ZZZ` and `WWW` with the binary representations of the sizes.
+       - **Mapping:**
+         - **128 bytes**: `3'b000`
+         - **256 bytes**: `3'b001`
+         - **512 bytes**: `3'b010`
+         - **1024 bytes**: `3'b011`
+         - **2048 bytes**: `3'b100`
+         - **4096 bytes**: `3'b101`
+       - **Example:**
+         - For **256 bytes** payload size:
+           ```verilog
+           max_payload_size_supported <= 3'b001; // Supports up to 256 bytes
+           ```
+         - For **512 bytes** read request size:
+           ```verilog
+           max_read_request_size_supported <= 3'b010; // Supports up to 512 bytes
+           ```
 
-     - Save the file after making the adjustments.
+4. **Save Changes:**
+
+   - **Save the File:**
+     - After updating the values, save the file.
+
+   - **Verify Consistency:**
+     - Ensure that the values in the firmware match those configured in the PCIe IP core.
+
+   - **Add Comments:**
+     - Document the changes for future reference.
+       ```verilog
+       max_payload_size_supported <= 3'b001; // 256 bytes as per donor device
+       max_read_request_size_supported <= 3'b010; // 512 bytes as per donor device
+       ```
 
 ### **8.2 Adjusting BARs and Memory Mapping**
 
-BARs define the memory regions that the device exposes to the host.
+Base Address Registers (BARs) define the memory regions that the device exposes to the host. Correctly configuring the BARs and memory mapping is crucial for accurate emulation and proper operation of device drivers.
 
 #### **8.2.1 Setting BAR Sizes**
 
-- **Steps**:
+Configuring the BAR sizes ensures that the device requests the correct amount of address space during enumeration and that the host maps these regions appropriately.
 
-  1. **Access BAR Configuration**:
+**Steps:**
 
-     - In the PCIe IP Core configuration, navigate to the **Base Address Registers (BARs)** tab.
+1. **Access BAR Configuration:**
 
-  2. **Configure BAR Sizes**:
+   - **Customize PCIe IP Core:**
+     - In Vivado, right-click on `pcie_7x_0.xci` and select **Customize IP**.
 
-     - Match the donor device's BAR sizes.
-     - For example, if **BAR0** is **64 KB**, set **BAR0** size to **64 KB**.
+   - **Navigate to BARs Tab:**
+     - In the IP customization window, click on the **Base Address Registers (BARs)** tab.
 
-  3. **Set BAR Types**:
+2. **Configure BAR Sizes and Types:**
 
-     - Specify whether each BAR is **32-bit** or **64-bit**, **Memory** or **I/O**, and **Prefetchable** or **Non-Prefetchable** as per the donor device.
+   - **Match Donor Device's BARs:**
+     - For each BAR (BAR0 to BAR5), set the size and type to match the donor device.
 
-  4. **Update BRAM Configurations**:
+   - **Set BAR Sizes:**
+     - Select the appropriate size from the dropdown for each BAR.
+       - **Example:**
+         - If **BAR0** is **64 KB**, set **BAR0 Size** to **64 KB**.
+         - If **BAR1** is **128 MB**, set **BAR1 Size** to **128 MB**.
 
-     - Ensure that the corresponding BRAM configurations in the `ip` directory are set correctly.
-     - **Files**:
-       ```
-       pcileech-wifi-main/ip/bram_bar_zero4k.xci
-       pcileech-wifi-main/ip/bram_pcie_cfgspace.xci
-       ```
+   - **Set BAR Types:**
+     - Choose between **32-bit** or **64-bit** addressing for each BAR.
+     - Specify if the BAR is of type **Memory** or **I/O**.
+     - Set **Prefetchable** status based on the donor device.
 
-  5. **Save and Regenerate**:
+   - **Enable or Disable BARs:**
+     - Ensure that only the BARs used by the donor device are enabled.
 
-     - Click **OK** to apply changes.
-     - Regenerate the IP core if prompted.
+3. **Update BRAM Configurations:**
+
+   - **Adjust BRAM IP Cores:**
+     - In the `ip` directory, locate the BRAM configurations corresponding to the BARs.
+       - **Files:**
+         ```
+         pcileech-fpga/pcileech-wifi-main/ip/bram_bar_zero4k.xci
+         pcileech-fpga/pcileech-wifi-main/ip/bram_pcie_cfgspace.xci
+         ```
+
+   - **Modify BRAM Sizes:**
+     - Open each BRAM IP core and adjust the memory size to match the corresponding BAR size.
+     - Ensure that the total memory does not exceed the FPGA's capacity.
+
+4. **Save and Regenerate:**
+
+   - **Apply Changes:**
+     - After configuring the BARs and updating BRAM sizes, click **OK** in the IP customization window.
+
+   - **Regenerate IP Cores:**
+     - Vivado may prompt you to regenerate the IP cores due to the changes.
+     - Allow the regeneration to complete.
+
+   - **Check for Errors:**
+     - Review the **Messages** window for any warnings or errors related to BAR configurations.
 
 #### **8.2.2 Defining BAR Address Spaces in Firmware**
 
-- **Steps**:
+With the BAR sizes and types set, you need to define how the firmware handles accesses to these BARs.
 
-  1. **Open the BAR Controller File**:
+**Steps:**
 
-     - Navigate to:
+1. **Open the BAR Controller File:**
+
+   - **Locate the Source File:**
+     - In Visual Studio Code, open:
        ```
-       pcileech-wifi-main/src/pcileech_tlps128_bar_controller.sv
+       pcileech-fpga/pcileech-wifi-main/src/pcileech_tlps128_bar_controller.sv
        ```
 
-  2. **Map Address Ranges**:
+2. **Map Address Ranges:**
 
-     - Define the address ranges and implement the logic to handle accesses to the BARs.
-     - **Example**:
+   - **Define Address Decoding Logic:**
+     - Implement logic to detect when a BAR is accessed based on the address.
        ```verilog
        always_comb begin
          if (bar_hit[0]) begin
-           // Handle BAR0 access
+           // Handle accesses to BAR0
          end else if (bar_hit[1]) begin
-           // Handle BAR1 access
+           // Handle accesses to BAR1
          end
-         // Continue for other BARs
+         // Continue for additional BARs
        end
        ```
 
-  3. **Implement Address Decoding Logic**:
+   - **Implement BAR Access Handling:**
+     - For each BAR, define how reads and writes are managed.
+       - **Example:**
+         ```verilog
+         if (bar_hit[0]) begin
+           case (addr_offset)
+             16'h0000: data_out <= reg0;
+             16'h0004: data_out <= reg1;
+             // Additional registers
+             default: data_out <= 32'h0;
+           endcase
+         end
+         ```
 
-     - Ensure that the firmware correctly decodes the BAR addresses and routes the transactions appropriately.
+3. **Implement Address Decoding Logic:**
 
-  4. **Save Changes**:
+   - **Calculate Address Offsets:**
+     - Use the incoming address to calculate offsets within the BAR.
+       ```verilog
+       addr_offset = incoming_address - bar_base_address[0];
+       ```
 
-     - Save the file after implementing the changes.
+   - **Handle Data Transfers:**
+     - Implement logic for read and write operations.
+       ```verilog
+       if (cfg_write) begin
+         // Write data to the appropriate register
+       end else if (cfg_read) begin
+         // Read data from the appropriate register
+       end
+       ```
+
+4. **Save Changes:**
+
+   - **Save the File:**
+     - After implementing the logic, save the `pcileech_tlps128_bar_controller.sv` file.
+
+   - **Verify Functionality:**
+     - Ensure that the logic correctly handles all possible accesses.
 
 #### **8.2.3 Handling Multiple BARs**
 
-- **Steps**:
+Properly managing multiple BARs is essential for devices that expose multiple memory or I/O regions.
 
-  1. **Implement Logic for Each BAR**:
+**Steps:**
 
-     - For each BAR, create a separate block in `pcileech_tlps128_bar_controller.sv` to handle its specific functionality.
+1. **Implement Logic for Each BAR:**
 
-  2. **Ensure Non-Overlapping Address Spaces**:
+   - **Separate Logic Blocks:**
+     - For clarity, create separate code blocks for each BAR within the controller.
+       ```verilog
+       // BAR0 Handling
+       if (bar_hit[0]) begin
+         // BAR0 specific logic
+       end
+       // BAR1 Handling
+       if (bar_hit[1]) begin
+         // BAR1 specific logic
+       end
+       ```
 
-     - Verify in the BAR configuration that the address spaces do not overlap and are aligned as per PCIe specifications.
+   - **Define Registers and Memories:**
+     - Allocate registers or memory blocks for each BAR as needed.
 
-  3. **Test BAR Accesses**:
+2. **Ensure Non-Overlapping Address Spaces:**
 
-     - Use simulation or hardware testing to ensure that each BAR is accessible and functions correctly.
+   - **Validate Address Ranges:**
+     - Confirm that the address spaces for each BAR do not overlap.
+     - Align BAR sizes to power-of-two boundaries as per PCIe specifications.
+
+   - **Update Address Decoding:**
+     - Adjust the address decoding logic to account for the sizes and bases of each BAR.
+
+3. **Test BAR Accesses:**
+
+   - **Simulation Testing:**
+     - Use simulation tools to test read and write operations to each BAR.
+     - Verify that the correct data is read or written.
+
+   - **Hardware Testing:**
+     - After programming the FPGA, use software tools on the host to access each BAR.
+     - **Example:**
+       - Use `lspci` on Linux to inspect BAR mappings.
+       - Write test programs that perform memory-mapped I/O to the BARs.
 
 ### **8.3 Emulating Device Power Management and Interrupts**
 
-Properly emulating power management and interrupts ensures compatibility with the host's expectations.
+Emulating power management features and implementing interrupts are critical for devices that need to interact closely with the host operating system's power and interrupt handling mechanisms.
 
 #### **8.3.1 Power Management Configuration**
 
-Emulate the power management capabilities of the donor device.
+Implementing power management allows the device to support various power states, contributing to system-wide power efficiency and compliance with operating system expectations.
 
-- **Steps**:
+**Steps:**
 
-  1. **Enable Power Management in PCIe IP Core**:
+1. **Enable Power Management in PCIe IP Core:**
 
-     - In the **Capabilities** section of the PCIe IP Core configuration, ensure **Power Management** is enabled.
+   - **Access Capabilities:**
+     - In the PCIe IP core customization window, select the **Capabilities** tab.
 
-  2. **Set Power States Supported**:
+   - **Enable Power Management:**
+     - Check the option for **Power Management** to include the capability in the device's configuration space.
 
-     - Configure the supported power states (e.g., **D0**, **D1**, **D2**, **D3hot**, **D3cold**).
+2. **Set Power States Supported:**
 
-  3. **Implement Power State Logic in Firmware**:
+   - **Configure Supported States:**
+     - Specify which power states the device supports, such as:
+       - **D0 (Fully On)**
+       - **D1, D2 (Intermediate States)**
+       - **D3hot, D3cold (Low Power States)**
+     - Match these settings to the donor device's capabilities.
 
-     - Open `pcileech_pcie_cfg_a7.sv` and handle power state transitions.
-     - Implement the required logic to manage power management registers.
-     - **Example**:
+3. **Implement Power State Logic in Firmware:**
+
+   - **Open `pcileech_pcie_cfg_a7.sv`:**
+     - Modify the firmware to handle power state transitions.
+
+   - **Handle Power Management Registers:**
+     - Implement read and write access to the Power Management Control and Status Register (PMCSR).
        ```verilog
-       // Handle power management control and status register writes
-       if (cfg_write && cfg_address == PMCSR_ADDRESS) begin
-         pmcsr_reg <= cfg_writedata[15:0];
-         // Update power state based on the pmcsr_reg[1:0]
-       end
-       ```
+       // PMCSR Address
+       localparam PMCSR_ADDRESS = 12'h44; // Example address
 
-  4. **Save Changes**:
+       // PMCSR Register
+       reg [15:0] pmcsr_reg;
 
-     - Save the file after making the changes.
-
-#### **8.3.2 MSI/MSI-X Configuration**
-
-Implementing Message Signaled Interrupts allows the device to signal interrupts to the host efficiently.
-
-- **Steps**:
-
-  1. **Enable MSI/MSI-X in PCIe IP Core**:
-
-     - In the **Interrupts** section, select **MSI** or **MSI-X** as required.
-
-  2. **Configure Number of Supported Vectors**:
-
-     - Match the number of interrupt vectors supported by the donor device.
-
-  3. **Implement Interrupt Logic in Firmware**:
-
-     - Open `pcileech_pcie_tlp_a7.sv`:
-       ```
-       pcileech-wifi-main/src/pcileech_pcie_tlp_a7.sv
-       ```
-
-     - Implement the logic to generate MSI/MSI-X interrupts.
-     - **Example**:
-       ```verilog
-       // Generate MSI interrupt
-       if (interrupt_condition) begin
-         msi_req <= 1'b1;
-       end else begin
-         msi_req <= 1'b0;
-       end
-       ```
-
-  4. **Save Changes**:
-
-     - Save the file after implementing the changes.
-
-#### **8.3.3 Implementing Interrupt Handling Logic**
-
-- **Steps**:
-
-  1. **Define Interrupt Conditions**:
-
-     - Determine the events in your firmware that should trigger an interrupt (e.g., data available, error conditions).
-
-  2. **Create Interrupt Generation Module**:
-
-     - In `pcileech_pcie_tlp_a7.sv`, implement the module that assembles and sends MSI/MSI-X interrupt TLPs.
-
-  3. **Ensure Proper Timing and Sequencing**:
-
-     - Verify that the interrupts are generated according to the PCIe specification's timing requirements.
-
-  4. **Test Interrupt Delivery**:
-
-     - Use hardware testing to confirm that the host receives and handles interrupts correctly.
-
-  5. **Save Changes**:
-
-     - Save the file after making the changes.
-
----
-
-## **9. Emulating Device-Specific Capabilities**
-
-To achieve a high-fidelity emulation of the donor device, it's essential to replicate not only its basic configuration but also its specific capabilities and features. This ensures that any software or driver interacting with the device will function as expected.
-
-### **9.1 Implementing Advanced PCIe Capabilities**
-
-Advanced PCIe capabilities may include features like **Advanced Error Reporting (AER)**, **Latency Tolerance Reporting (LTR)**, and **Vendor-Specific Extended Capabilities (VSEC)**.
-
-#### **9.1.1 Enabling Advanced Error Reporting (AER)**
-
-AER provides mechanisms for reporting PCIe errors to the host.
-
-- **Steps**:
-
-  1. **Enable AER in PCIe IP Core**:
-
-     - In the **Advanced Features** section of the PCIe IP Core configuration, enable **Advanced Error Reporting**.
-
-  2. **Implement Error Handling Logic**:
-
-     - Open `pcileech_pcie_cfgspace_shadow.sv`:
-       ```
-       pcileech-wifi-main/src/pcileech_pcie_cfgspace_shadow.sv
-       ```
-
-     - Add registers and logic to handle AER.
-     - **Example**:
-       ```verilog
-       // Define AER registers
-       reg [31:0] aer_uncorrectable_error_status;
-       reg [31:0] aer_uncorrectable_error_mask;
-       // Implement logic to update these registers upon errors
-       ```
-
-  3. **Populate AER Registers**:
-
-     - Set default values and implement logic to update these registers upon error conditions.
-
-  4. **Save Changes**:
-
-     - Save the file after making the changes.
-
-#### **9.1.2 Configuring Latency Tolerance Reporting (LTR)**
-
-LTR allows devices to inform the host of their latency tolerance, optimizing power management.
-
-- **Steps**:
-
-  1. **Enable LTR Capability**:
-
-     - In the PCIe IP Core configuration, enable **Latency Tolerance Reporting** under the **Capabilities** section.
-
-  2. **Set LTR Parameters**:
-
-     - Configure the **Max Snooze Latency** and **Max No Snooze Latency** values according to the donor device's specifications.
-
-  3. **Update Firmware Logic**:
-
-     - In `pcileech_pcie_cfg_a7.sv`, add the necessary registers and logic to handle LTR.
-     - **Example**:
-       ```verilog
-       // Define LTR registers
-       reg [31:0] ltr_max_snoop_latency;
-       reg [31:0] ltr_max_no_snoop_latency;
-       // Implement logic to report latency values
-       ```
-
-  4. **Save Changes**:
-
-     - Save the file after making the changes.
-
-#### **9.1.3 Implementing Vendor-Specific Extended Capabilities (VSEC)**
-
-If the donor device uses VSEC, these need to be emulated.
-
-- **Steps**:
-
-  1. **Define VSEC Structures**:
-
-     - In `pcileech_pcie_cfgspace_shadow.sv`, add definitions for the VSEC registers.
-     - **Example**:
-       ```verilog
-       // VSEC Header
-       reg [15:0] vsec_cap_id;    // Set to 16'h000B for VSEC
-       reg [3:0]  vsec_cap_version;
-       reg [11:0] vsec_cap_nextptr;
-       reg [16:0] vsec_vendor_id;
-       reg [15:0] vsec_length;
-       // Vendor-Specific Data
-       reg [31:0] vsec_data[0:VSEC_LENGTH-1];
-       ```
-
-  2. **Populate VSEC Fields**:
-
-     - Assign the **Capability ID**, **Length**, and **Vendor-Specific Data** to match the donor device.
-
-  3. **Handle VSEC Accesses**:
-
-     - Implement read/write logic to allow the host to interact with the VSEC.
-     - **Example**:
-       ```verilog
-       // Handle VSEC register accesses
+       // Handle PMCSR Writes
        always @(posedge clk) begin
-         if (cfg_write && cfg_address >= VSEC_BASE && cfg_address < VSEC_BASE + VSEC_LENGTH) begin
-           vsec_data[cfg_address - VSEC_BASE] <= cfg_writedata;
+         if (cfg_write && cfg_address == PMCSR_ADDRESS) begin
+           pmcsr_reg <= cfg_writedata[15:0];
+           // Update power state based on pmcsr_reg[1:0]
          end
        end
        ```
 
-  4. **Save Changes**:
+   - **Manage Power State Effects:**
+     - Implement the logic to alter device behavior based on the current power state.
 
-     - Save the file after implementing the changes.
+4. **Save Changes:**
 
-### **9.2 Emulating Vendor-Specific Features**
+   - **Save the Firmware File:**
+     - Ensure all modifications are saved.
 
-Some devices have unique features that are specific to the manufacturer. Emulating these requires a deeper understanding of the device's operation.
+   - **Verify Functionality:**
+     - Test the power management features through simulation or hardware testing.
 
-#### **9.2.1 Analyzing the Donor Device**
+#### **8.3.2 MSI/MSI-X Configuration**
 
-- **Steps**:
+Implementing MSI/MSI-X allows the device to use message-based interrupts, which are more efficient and scalable than traditional pin-based interrupts.
 
-  1. **Review Device Documentation**:
+**Steps:**
 
-     - Obtain the datasheet or technical manual of the donor device.
-     - Identify any proprietary features or registers.
+1. **Enable MSI/MSI-X in PCIe IP Core:**
 
-  2. **Use Diagnostic Tools**:
+   - **Access Interrupts Configuration:**
+     - In the PCIe IP core customization window, navigate to the **Interrupts** or **MSI/MSI-X** tab.
 
-     - Employ tools like **Arbor** or **PCIe protocol analyzers** to observe the donor device's behavior.
+   - **Select Interrupt Type:**
+     - Choose **MSI** or **MSI-X** based on the donor device.
 
-  3. **Identify Unique Behaviors**:
+   - **Configure Number of Supported Vectors:**
+     - Set the number of interrupt vectors to match the donor device.
+       - **MSI** supports up to 32 vectors.
+       - **MSI-X** supports up to 2048 vectors.
 
-     - Note any custom protocols, command sequences, or special register accesses.
+   - **Enable Capabilities:**
+     - Ensure that the MSI or MSI-X capabilities are included in the device's configuration space.
 
-#### **9.2.2 Implementing Custom Registers and Functions**
+2. **Implement Interrupt Logic in Firmware:**
 
-- **Steps**:
+   - **Open `pcileech_pcie_tlp_a7.sv`:**
+     - Modify the firmware to handle interrupt generation.
 
-  1. **Define Custom Registers**:
+   - **Define Interrupt Signals:**
+     - Declare signals for MSI/MSI-X requests.
+       ```verilog
+       reg msi_req;
+       ```
 
-     - In your firmware, create registers that mirror the donor device's custom registers.
-     - Assign appropriate addresses and default values.
+   - **Implement Interrupt Generation Logic:**
+     - Define conditions under which an interrupt is triggered.
+       ```verilog
+       // Example Interrupt Condition
+       wire interrupt_condition = /* condition logic */;
 
-  2. **Implement Access Logic**:
+       // Generate MSI Interrupt
+       always @(posedge clk) begin
+         if (interrupt_condition) begin
+           msi_req <= 1'b1;
+         end else begin
+           msi_req <= 1'b0;
+         end
+       end
+       ```
 
-     - Handle read and write operations to these registers.
-     - Ensure that the behavior matches the donor device.
+   - **Connect to PCIe Core:**
+     - Ensure that the `msi_req` signal is properly connected to the PCIe IP core's interrupt interface.
 
-  3. **Emulate Device-Specific Functions**:
+3. **Save Changes:**
 
-     - Implement any algorithms or state machines required for device-specific operations.
-     - This may involve processing certain commands or data patterns.
+   - **Save the Firmware File:**
+     - After implementing the interrupt logic, save the file.
 
-  4. **Save Changes**:
+   - **Check for Timing Constraints:**
+     - Verify that the new logic does not introduce timing violations.
 
-     - Save the files after making the changes.
+#### **8.3.3 Implementing Interrupt Handling Logic**
 
-#### **9.2.3 Testing Vendor-Specific Features**
+Defining when and how interrupts are generated is essential for the device's interaction with the host's interrupt handling mechanisms.
 
-- **Steps**:
+**Steps:**
 
-  1. **Develop Test Cases**:
+1. **Define Interrupt Conditions:**
 
-     - Create scenarios that exercise the vendor-specific features.
+   - **Identify Trigger Events:**
+     - Determine specific events that should cause an interrupt.
+       - **Examples:**
+         - Data ready for processing.
+         - Error conditions.
+         - Completion of a task.
 
-  2. **Use Donor Device Drivers**:
+   - **Implement Condition Logic:**
+     - Use combinational or sequential logic to detect these events.
 
-     - Install the donor device's drivers and use associated software to interact with the emulated device.
+2. **Create Interrupt Generation Module:**
 
-  3. **Monitor and Debug**:
+   - **Modular Design:**
+     - Implement the interrupt logic as a separate module for clarity and reuse.
+       ```verilog
+       module interrupt_controller(
+         input wire clk,
+         input wire reset,
+         input wire event_trigger,
+         output reg msi_req
+       );
+         always @(posedge clk or posedge reset) begin
+           if (reset) begin
+             msi_req <= 1'b0;
+           end else if (event_trigger) begin
+             msi_req <= 1'b1;
+           end else begin
+             msi_req <= 1'b0;
+           end
+         end
+       endmodule
+       ```
 
-     - Use debugging tools to monitor interactions and verify correct behavior.
-     - Adjust firmware as necessary to correct any discrepancies.
+   - **Integrate with Main Firmware:**
+     - Instantiate the module and connect it to the main firmware logic.
 
-  4. **Validate Functionality**:
+3. **Ensure Proper Timing and Sequencing:**
 
-     - Ensure that all vendor-specific features function as expected.
+   - **Adhere to PCIe Specifications:**
+     - Ensure interrupts are generated and cleared according to the protocol.
+
+   - **Manage Interrupt Latency:**
+     - Optimize logic to minimize delay between event occurrence and interrupt generation.
+
+4. **Test Interrupt Delivery:**
+
+   - **Simulation:**
+     - Use simulation tools to verify that interrupts are generated correctly.
+
+   - **Hardware Testing:**
+     - Program the FPGA and use host-side software to confirm that interrupts are received and handled.
+
+   - **Debugging Tools:**
+     - Utilize Integrated Logic Analyzer (ILA) cores to monitor signals in real time.
+
+5. **Save Changes:**
+
+   - **Finalize Code:**
+     - Ensure all changes are saved and documented.
+
+   - **Review and Refine:**
+     - Iterate on the design as needed based on testing results.
 
 ---
 
