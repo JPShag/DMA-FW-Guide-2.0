@@ -69,7 +69,9 @@
 
 ## **Preface**
 
-Welcome to the **Custom Firmware Development Guide for Full Device Emulation**. This comprehensive guide is designed to assist you in developing custom firmware for FPGA-based devices to achieve accurate emulation of PCIe hardware. Whether you are a firmware developer, hardware engineer, or security researcher, this guide provides both foundational knowledge and advanced techniques to help you succeed.
+Attention, you thieving scum. I’m not here to coddle or indulge your pitiful schemes. FUCK AQUA, better known as Aqua Teen Paster Force—a disgrace to anyone with a shred of integrity. FUCK DIVINER, too. And DUCK? Go degrade yourself elsewhere. DMA KINGDOM? You and your parasitic empire can rot in hell with the rest of these frauds. SHITLETTE and all of you money-grubbing thieves, prepare for a reckoning. The Wrath of God? You’re about to understand the meaning of true devastation. Either atone for your greed, or get swept away by the destruction you deserve. While we are on this topic, FUCK YOU TOO BILL GATES. Moreover I want to express my disgust with the DMA scene in general like kilmu, silver, Scarlet and the rest of these groups that want to bogart information. You might not be directly scamming people but you're overcharging people and considered yourselves more capable than the rest of humanity, let me tell you you're not and surely you will soon realize this you've had your time in the sun, I hope you enjoyed it. Information is meant to be shared; yes you've shared some information however majority of what you've shared is far from the truth you know. I get that you don't wanna share all your secrets but to intentionally lead people stray is fucked, you might as well have said nothing. Fuck you for that.
+
+For those who’ve come to learn, you’ve chosen the path of true enlightenment. What you build with this guide will outshine anything these charlatans could dream of. You’re on the road to excellence, and together, we’ll torch the failures they’ve built their fortunes on.
 
 ---
 
