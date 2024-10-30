@@ -510,11 +510,6 @@ The configuration space is defined within a specific SystemVerilog (.sv) file in
   src\pcie_7x\pcie_7x_0_core_top.v
   ```
 
-**Notes:**
-
-- Ensure you are in the correct project directory.
-- The file name may vary slightly depending on the FPGA model (e.g., `_a7` indicates Artix-7 series).
-
 #### **6.1.2 Open the File in Visual Studio Code**
 
 Editing the configuration file requires a suitable code editor that supports syntax highlighting for SystemVerilog.
