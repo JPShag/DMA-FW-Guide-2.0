@@ -502,12 +502,12 @@ The configuration space is defined within a specific SystemVerilog (.sv) file in
 
 - **Standard Path:**
   ```
-  pcileech-fpga/pcileech-wifi-main/src/pcileech_pcie_cfg_a7.sv
+  pcileech-fpga/pcileech-wifi-main/src/pcie_7x_0_core_top.v
   ```
 
 - **Alternative Path (Depending on Directory Structure):**
   ```
-  pcileech-fpga/src/pcileech_pcie_cfg_a7.sv
+  src\pcie_7x\pcie_7x_0_core_top.v
   ```
 
 **Notes:**
