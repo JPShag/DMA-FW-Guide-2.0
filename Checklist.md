@@ -27,9 +27,6 @@ Collect the following information from the donor PCIe device:
 
 ### **2.1. Open Firmware Configuration File**
 
-- [ ] **File to Edit**: `pcileech_pcie_cfg_a7.sv`
-- [ ] **Location**: `pcileech-fpga/pcileech-wifi-main/src/pcileech_pcie_cfg_a7.sv`
-
 ### **2.2. Update Device and Vendor IDs**
 
 - [ ] **Modify** `cfg_deviceid`:
